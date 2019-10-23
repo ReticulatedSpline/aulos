@@ -26,11 +26,3 @@ Browse by ID3 tag groups
 [Pi 3 A+](https://www.adafruit.com/product/4027)
 
 [Amp for Pi 3 A+](https://www.hifiberry.com/products/ampplus/)
-
-[Explora](https://store.arduino.cc/usa/arduino-esplora) - Onboard interactables
-  
-[Buttons](https://www.adafruit.com/product/367)
-
-[Screen](https://www.adafruit.com/product/358)
-
-[Audio](https://www.adafruit.com/product/1790)
