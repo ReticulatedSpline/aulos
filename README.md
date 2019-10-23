@@ -23,10 +23,11 @@ Browse by ID3 tag groups
 
 # Possible part list
 
-[Board](https://www.adafruit.com/product/4027)
-[Amp](https://www.hifiberry.com/products/ampplus/)
+[Pi 3 A+](https://www.adafruit.com/product/4027)
 
-  [Explora](https://store.arduino.cc/usa/arduino-esplora) - Onboard interactables
+[Amp for Pi 3 A+](https://www.hifiberry.com/products/ampplus/)
+
+[Explora](https://store.arduino.cc/usa/arduino-esplora) - Onboard interactables
   
 [Buttons](https://www.adafruit.com/product/367)
 
