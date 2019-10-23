@@ -23,7 +23,8 @@ Browse by ID3 tag groups
 
 # Possible part list
 
-Boards: https://www.raspberrypi.org/products/raspberry-pi-3-model-a-plus/
+[Board](https://www.adafruit.com/product/4027)
+[Amp](https://www.hifiberry.com/products/ampplus/)
 
   [Explora](https://store.arduino.cc/usa/arduino-esplora) - Onboard interactables
   
