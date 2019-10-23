@@ -25,6 +25,4 @@ Browse by ID3 tag groups
 
 [Pi 3 A+](https://www.adafruit.com/product/4027)
 
-[Amp for Pi 3 A+](https://www.hifiberry.com/products/ampplus/)
-
 [2.8 inch screen](https://www.adafruit.com/product/1601)
