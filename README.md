@@ -21,8 +21,13 @@ Display album art
 
 Browse by ID3 tag groups
 
-# Possible part list
-
+# Ordered Parts
 [Pi 3 A+](https://www.adafruit.com/product/4027)
 
 [2.8 inch screen](https://www.adafruit.com/product/1601)
+
+# Un-Ordered Parts
+
+# Coding Ideas
+
+[possible GUI for c++](https://github.com/ocornut/imgui)
