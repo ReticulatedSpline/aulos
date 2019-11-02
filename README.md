@@ -1,32 +1,24 @@
-# openDAC
-Drop-in replacement for an iPod classic
+# openDAP
+A drop-in Python replacement for a the iPod classic using the Raspberry Pi.
 
-# Requirements
-Accepts an arbitrary storage size (likely SD or microSD)
+# Roadmap
 
-Ability to play back mp3, flac, and wav files at a reasonable quality
+- [ ] Play back mp3, flac, and wav files at a reasonable quality
 
-CRUD for song metadata and m3u playlist files
+- [ ] View ID3 tags and other song metadata
 
-Log local CRUD operations for sync back to a master library
+- [ ] UI with current song and playback progress
 
-UI with current song and playback progress
+- [ ] Browse local library by artist, album, and other ID3 tags
 
-Reasonable battery life
+- [ ] Playlist and song CRUD functionality for song metadata and .m3u playlist files. This will be logged to support syncing back to a master library (such as on desktop).
 
-# Optional Features
-Update ID3 tags: select from existing tags
+- [ ] Display album art
 
-Display album art
+# Hardware Partlist
+[Raspberry Pi 3 A+](https://www.adafruit.com/product/4027)
 
-Browse by ID3 tag groups
-
-# Ordered Parts
-[Pi 3 A+](https://www.adafruit.com/product/4027)
-
-[2.8 inch screen](https://www.adafruit.com/product/1601)
-
-# Un-Ordered Parts
+[2.8 inch touchscreen display](https://www.adafruit.com/product/1601)
 
 # Coding Ideas
 
