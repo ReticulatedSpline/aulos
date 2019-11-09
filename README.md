@@ -15,11 +15,7 @@ A drop-in Python replacement for a the iPod classic using the Raspberry Pi.
 
 - [ ] Display album art
 
-# Hardware Partlist
+# Hardware Part List
 [Raspberry Pi 3 A+](https://www.adafruit.com/product/4027)
 
-[2.8 inch touchscreen display](https://www.adafruit.com/product/1601)
-
-# Coding Ideas
-
-[possible GUI for c++](https://github.com/ocornut/imgui)
+[2.8 inch touchscreen display](https://www.adafruit.com/product/1601)d
