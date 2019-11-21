@@ -34,3 +34,9 @@ A drop-in Python replacement for a the iPod classic using the Raspberry Pi.
 [Raspberry Pi 3 A+](https://www.adafruit.com/product/4027)
 
 [2.8 inch touchscreen display](https://www.adafruit.com/product/1601)
+
+# Development Setup
+1. Install Python 3+, and then install dependencies:
+`pip3 install -r requirements.txt`
+
+2. Create the `./music` `./playlists` directories for your library.
