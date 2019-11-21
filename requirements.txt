@@ -1,3 +1,5 @@
-OpenDAP
+# add required python packages here
+pynput==1.4.5
 mutagen==1.41.1
+progress==1.5
 python-vlc==3.0.7110
