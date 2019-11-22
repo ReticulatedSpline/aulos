@@ -1,4 +1,4 @@
 music/*
 playlists/*
-
+*.pyc
 .DS_Store
