@@ -1,5 +1,5 @@
 # openDAP
-A drop-in Python replacement for a the iPod classic using the Raspberry Pi.
+A drop-in Python replacement for the iPod classic using the Raspberry Pi.
 
 # Roadmap
 ### v1
