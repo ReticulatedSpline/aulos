@@ -38,7 +38,6 @@ A drop-in Python replacement for a the iPod classic using the Raspberry Pi.
 # Development Setup
 1. Install Python 3+, and then install dependencies:
 `pip3 install -r requirements.txt`
-2. If on MacOS, you'll need to allow your terminal permissions for the [pynput keyboard listener](https://pynput.readthedocs.io/en/latest/limitations.html#mac-osx). This is under System Preferences ▶ Security and Privacy ▶ Accessibility.
-3. Run python3 src/main.py
-
-2. Create the `./music` `./playlists` directories for your library.
+1. If on MacOS, you'll need to allow your terminal permissions for the [pynput keyboard listener](https://pynput.readthedocs.io/en/latest/limitations.html#mac-osx). This is under System Preferences ▶ Security and Privacy ▶ Accessibility.
+1. Optionally add some files to `./music` `./playlists`.
+1. Run python3 src/main.py
