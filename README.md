@@ -40,4 +40,4 @@ A drop-in Python replacement for the iPod classic using the Raspberry Pi.
 `pip3 install -r requirements.txt`
 1. If on MacOS, you'll need to allow your terminal permissions for the [pynput keyboard listener](https://pynput.readthedocs.io/en/latest/limitations.html#mac-osx). This is under System Preferences ▶ Security and Privacy ▶ Accessibility.
 1. Optionally add some files to `./music` `./playlists`.
-1. Run python3 src/main.py
+1. Run `python3 src/main.py`
