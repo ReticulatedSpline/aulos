@@ -36,7 +36,8 @@ A drop-in Python replacement for the iPod classic using the Raspberry Pi.
 [2.8 inch touchscreen display](https://www.adafruit.com/product/1601)
 
 # Development Setup
-1. Install Python 3+, and then install dependencies:
+1. Install [VLC](https://www.videolan.org/vlc/) if you don't have it already.
+1. Install [Python 3+](https://www.python.org/), and then install dependencies:
 `pip3 install -r requirements.txt`
 1. If on MacOS, you'll need to allow your terminal permissions for the [pynput keyboard listener](https://pynput.readthedocs.io/en/latest/limitations.html#mac-osx). This is under System Preferences ▶ Security and Privacy ▶ Accessibility.
 1. Optionally add some files to `./music` `./playlists`.
