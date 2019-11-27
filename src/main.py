@@ -6,36 +6,33 @@ from view import View
 from player import Player
 
 
-def on_press(key, view, player):
-    view.notify('Entered listener!')
-    if key == ord('p'):
+def on_press(key: keyboard.KeyCode, view: View, player: Player):
+    """Handle keypresses. Deprecate for touchscreen eventually."""
+    key = str(key).strip('\'')
+    if str(key) == 'p':
         view.notify('Playing...')
         player.play()
         return
-    elif key == ord('a'):
+    elif key == 'a':
         view.notify('Pausing...')
         player.pause()
-    elif key == ord('n'):
-        view.notify('Skipping forward...')
+    elif key == 'n':
+        view.notify('Skipping Forward...')
         player.skip_forward()
         return
-    elif key == ord('l'):
-        view.notify('Skipping back...')
+    elif key == 'l':
+        view.notify('Skipping Back...')
         player.skip_back()
         return
-    elif key == ord('q'):
-        view.notify('Quitting...')
+    elif key == 'q':
+        view.notify('Exiting...')
         del view
         del player
         exit(0)
     view.update_ui(player.get_metadata())
 
+
 view = View()
 player = Player()
-listener = keyboard.Listener(
-    on_press=partial(on_press, view=view, player=player))
-listener.start()
-
-while True:
-    view.update_ui(player.get_metadata())
-    continue
+with keyboard.Listener(on_press=partial(on_press, view=view, player=player)) as listener:
+    listener.join()
