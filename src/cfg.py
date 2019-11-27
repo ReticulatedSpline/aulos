@@ -1,4 +1,7 @@
 # configuration for openDAP
 
-# how many ticks to key notifications on the screen for
-noti_timeout = 200000
+# file types to scan for
+filetypes = {'.mp3', '.flac'}
+
+# loading bar char
+prog_fill = '#'
