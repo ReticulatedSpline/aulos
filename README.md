@@ -10,8 +10,6 @@ A drop-in Python replacement for the iPod classic using the Raspberry Pi.
 
 - [ ] Browse local library by artist, album, and m3u playlist
 
-- [ ] Compatibility with the AdaFruit PiTFT touch display
-
 ### V2
 
 - [ ] View all ID3 tags and other song metadata
@@ -22,9 +20,11 @@ A drop-in Python replacement for the iPod classic using the Raspberry Pi.
 
 - [ ] Queue functionality
 
-- [ ] Create, update, and deletion functionality for songs, song metadata, and .m3u playlist files. Log operations to support syncing back to a master library (such as on a desktop).
+- [ ] Compatibility with the AdaFruit PiTFT touch display or hardware buttons
 
 ### V3
+
+- [ ] Create, update, and deletion functionality for songs, song metadata, and .m3u playlist files. Log operations to support syncing back to a master library (such as on a desktop).
 
 - [ ] Battery integration
 
