@@ -1,13 +1,14 @@
-import time, os
+import time, sys, os
 from pynput import keyboard
 from functools import partial
 
 from view import View
 from player import Player
 
-
+exit_signal = False
 def on_press(key: keyboard.KeyCode, view: View, player: Player):
     """Handle keypresses. Deprecate for touchscreen eventually."""
+    global exit_signal
     key = str(key).strip('\'')
     if str(key) == 'p':
         view.notify('Playing...')
@@ -23,18 +24,17 @@ def on_press(key: keyboard.KeyCode, view: View, player: Player):
         player.skip_back()
     elif key == 'q':
         view.notify('Exiting...')
-        del view
+        exit_signal = True
         del player
-        os.exit(0)
-    view.notify(str(player.get_metadata()))
+        del view
+        return False
     view.update_ui(player.get_metadata())
 
 
 view = View()
 player = Player()
-listener = keyboard.Listener(
-    on_press=partial(on_press, view=view, player=player))
-listener.start()
-
-while True:
-    time.sleep(.5)
+with keyboard.Listener(on_press=partial(on_press, view=view, player=player)) as listener:
+    while exit_signal == False:
+        time.sleep(1)
+    listener.join()
+    os.system('reset')
