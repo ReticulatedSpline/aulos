@@ -32,7 +32,7 @@ A drop-in Python replacement for the iPod classic using the Raspberry Pi.
 
 - [ ] Battery integration
 
-- [ ] Sync songs via WiFi and/or Bluetooth (with other OpenDACs?)
+- [ ] Sync songs via WiFi and/or Bluetooth (with other openDAPs?)
 
 # Recommended Hardware
 [Raspberry Pi 3 A+](https://www.adafruit.com/product/4027)
