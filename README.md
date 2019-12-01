@@ -6,6 +6,8 @@ A drop-in Python replacement for the iPod classic using the Raspberry Pi.
 
 - [x] Play back mp3, flac, and wav files at a reasonable quality
 
+- [ ] Support for m3u playlists
+
 - [ ] UI with current song and playback progress
 
 - [ ] Browse local library by artist, album, and m3u playlist
