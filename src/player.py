@@ -8,7 +8,7 @@ playlist_path = os.path.abspath(os.path.join(__file__, '../../playlists'))
 
 
 class Player:
-    """Wrap calls to the VLC plugin and handle scanning for media."""
+    """Track player state, wrap calls to the VLC plugin, and handle scanning for media."""
 
     def __init__(self):
         self.song_list = []
@@ -20,6 +20,7 @@ class Player:
         self.__update_song()
 
     def __del__(self):
+        del self.vlc
         return
 
     def __scan_library(self):
