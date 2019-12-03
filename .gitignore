@@ -1,9 +1,15 @@
+# user media
 music/*
 playlists/*
 
+# python
 *.pyc
 __pycache__
 
-*.code-workspace
+# macOS
 .DS_Store
+._*
+
+# editors
+*.code-workspace
 
