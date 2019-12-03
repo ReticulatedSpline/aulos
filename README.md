@@ -1,7 +1,7 @@
 # openDAP
 A drop-in Python replacement for the iPod classic using the Raspberry Pi.
 
-# Roadmap
+## Roadmap
 ### v1
 
 - [x] Play back .mp3 and .flac files
@@ -34,12 +34,12 @@ A drop-in Python replacement for the iPod classic using the Raspberry Pi.
 
 - [ ] Sync songs via WiFi and/or Bluetooth (with other openDAPs?)
 
-# Recommended Hardware
+## Recommended Hardware
 [Raspberry Pi 3 A+](https://www.adafruit.com/product/4027)
 
 [2.8 inch touchscreen display](https://www.adafruit.com/product/1601)
 
-# Development Setup
+## Development Setup
 1. Install [VLC](https://www.videolan.org/vlc/) if you don't have it already.
 1. Install [Python 3+](https://www.python.org/), and then install dependencies:
 `pip3 install -r requirements.txt`
