@@ -12,7 +12,7 @@ A drop-in Python replacement for the iPod classic using the Raspberry Pi.
 
 - [ ] Browse local library by artist, album, and m3u playlist
 
-### V2
+### v2
 
 - [ ] View all ID3 tags and other song metadata
 
@@ -26,7 +26,7 @@ A drop-in Python replacement for the iPod classic using the Raspberry Pi.
 
 - [ ] Compatibility with the AdaFruit PiTFT touch display or hardware buttons
 
-### V3
+### v3
 
 - [ ] Display album art
 
