@@ -87,13 +87,13 @@ class View:
         self.__clear_line(self.line1)
         self.__clear_line(self.line2)
         if metadata is None:
-            self.screen.addstr(self.line1, 1, cfg.no_media_en)
-            self.screen.addstr(self.line2, 1, cfg.no_progress_en)
+            self.screen.addstr(self.line2, 1, cfg.no_media_en)
+            self.screen.addstr(self.line3, 1, cfg.no_progress_en)
         else:
             if metadata['playing']:
                 info_line = metadata['title'] + cfg.song_sep_en + metadata['artist']
             else:
-                info_line = cfg.no_load_en
+                info_line = '-' + cfg.song_sep_en + '-'
             self.screen.addstr(self.line1, 1, info_line)
             self.screen.addstr(2, 1, cfg.prompt_en)
             self.__build_progress_str(metadata)
