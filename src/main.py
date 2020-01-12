@@ -41,7 +41,7 @@ def tick(view: View, player:Player):
 view = View()
 player = Player()
 
-
+view.notify("Ready!")
 with keyboard.Listener(on_press=partial(on_press, view=view, player=player)) as listener:
     while exit_signal == False:
         tick(view, player)

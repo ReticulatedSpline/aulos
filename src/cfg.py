@@ -13,11 +13,10 @@ time_sep_en = " of "
 # file types to scan for
 file_types = {'.mp3', '.flac'}
 
-# loading bar fill
-prog_fill = '#'
+# loading bar filler
+prog_fill = '▒'
 
-# ui refresh interval (seconds)
-tick_rate = 1
-
-# possible values: {days}:{hours}:{minutes}:{seconds}
-time_format = "{hours}:{minutes}:{seconds}"
+# time formats
+time_format_dh = "{days} days, {hours}:{minutes}:{seconds}"
+time_format_h = "{hours}:{minutes}:{seconds}"
+time_format = "{minutes}:{seconds}"
