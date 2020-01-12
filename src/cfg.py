@@ -15,8 +15,3 @@ file_types = {'.mp3', '.flac'}
 
 # loading bar filler
 prog_fill = '▒'
-
-# time formats
-time_format_dh = "{days} days, {hours}:{minutes}:{seconds}"
-time_format_h = "{hours}:{minutes}:{seconds}"
-time_format = "{minutes}:{seconds}"

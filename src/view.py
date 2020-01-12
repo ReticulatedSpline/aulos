@@ -34,34 +34,35 @@ class View:
 
     def __strfdelta(self, tdelta: timedelta):
         """Format a timedelta into a string"""
-        time = {"days": tdelta.days}
-        time["hours"], rem = divmod(tdelta.seconds, 3600)
-        time["minutes"], time["seconds"] = divmod(rem, 60)
-        if time["days"] > 0:
-            time_format = cfg.time_format_dh
-        elif time["hours"] > 0:
-            time_format = cfg.time_format_h
-        else:
-            time_format = cfg.time_format
-        return time_format.format(**time)
+        days = tdelta.days
+        hours, rem = divmod(tdelta.seconds, 3600)
+        minutes, seconds = divmod(rem, 60)
 
-    def __build_progress_str(self, metadata):
+        time_str = ''
+        if days > 0:
+            time_str += str(days) + ' days, '
+        if hours > 0:
+            time_str += str(hours) + ' hours '
+        time_str += str(minutes)
+        time_str += ':'
+        if (seconds < 10):
+            time_str += '0'
+        time_str += str(seconds)
+        return time_str
+
+    def __update_progress_info(self, metadata):
         if metadata is None:
-            return cfg.no_load_en
+            return
+
         run_time = metadata["run_time"]
         curr_time = metadata["curr_time"]
 
-        if (None in [curr_time, run_time]) or (run_time <= 0):
-            return cfg.no_load_en
-
         if run_time == 0:
-            percent = 0
-        else:
-             percent = int((curr_time / run_time) * 100)
+            return
 
+        percent = int((curr_time / run_time) * 100)
         run_time_str = self.__strfdelta(timedelta(seconds=run_time))
         curr_time_str = self.__strfdelta(timedelta(seconds=curr_time))
-
         time_str = curr_time_str + cfg.time_sep_en + run_time_str + ' (' + str(percent) + '%)'
 
         # two border characters
@@ -84,19 +85,14 @@ class View:
     def update_ui(self, metadata: dict):
         """Update track metadata and progress indicators."""
 
-        self.__clear_line(self.line1)
-        self.__clear_line(self.line2)
         if metadata is None:
-            self.screen.addstr(self.line2, 1, cfg.no_media_en)
-            self.screen.addstr(self.line3, 1, cfg.no_progress_en)
+            return
         else:
             if metadata['playing']:
                 info_line = metadata['title'] + cfg.song_sep_en + metadata['artist']
-            else:
-                info_line = '-' + cfg.song_sep_en + '-'
-            self.screen.addstr(self.line1, 1, info_line)
+                self.screen.addstr(self.line1, 1, info_line)
             self.screen.addstr(2, 1, cfg.prompt_en)
-            self.__build_progress_str(metadata)
+            self.__update_progress_info(metadata)
         self.__draw_border()
         self.__set_cursor()
         self.screen.refresh()

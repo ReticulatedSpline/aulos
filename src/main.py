@@ -15,7 +15,7 @@ def on_press(key: keyboard.KeyCode, view: View, player: Player):
         view.notify('Playing...')
         player.play()
     elif key == 'a':
-        view.notify('Pausing...')
+        view.notify('Paused')
         player.pause()
     elif key == 'n':
         view.notify('Skipping Forward...')
