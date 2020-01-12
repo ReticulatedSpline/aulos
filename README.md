@@ -1,6 +1,8 @@
 # openDAP
 An open source digital audio player program designed for the Raspberry Pi and a PiTFT display. Uses [VLC media player](https://en.wikipedia.org/wiki/VLC_media_player) for media playback and the [curses library](https://en.wikipedia.org/wiki/Curses_%28programming_library%29) for a text-based user interface.
 
+![screen capture of openDAP's textual interface](https://i.imgur.com/6k4LK09.png)
+
 ## Roadmap
 ### v1
 
