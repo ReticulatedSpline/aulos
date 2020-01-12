@@ -8,7 +8,7 @@ An open source digital audio player program designed for the Raspberry Pi and a 
 
 - [x] UI with current song and playback progress
 
-- [ ] Support for m3u playlists
+- [ ] Support for .m3u playlists
 
 - [ ] Browse local library by artist, album, and m3u playlist
 
