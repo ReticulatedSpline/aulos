@@ -52,13 +52,13 @@ class View:
         if run_time == 0:
             percent = 0
         else:
-             percent = curr_time // run_time
+             percent = int((curr_time / run_time) * 100)
 
         run_time_str = self.__strfdelta(timedelta(seconds=run_time), cfg.time_format)
         curr_time_str = self.__strfdelta(timedelta(seconds=curr_time), cfg.time_format)
-        time_str = curr_time_str + cfg.time_sep_en + run_time_str + ' ' + str(percent) + '%'
+        time_str = curr_time_str + cfg.time_sep_en + run_time_str + ' (' + str(percent) + '%)'
 
-        fill_count = int(percent * 15)
+        fill_count = int(15 * curr_time / run_time)
         progress_fill = cfg.prog_fill * fill_count
         progress_void = ' ' * (15 - fill_count)
 

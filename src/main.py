@@ -44,7 +44,6 @@ player = Player()
 
 with keyboard.Listener(on_press=partial(on_press, view=view, player=player)) as listener:
     while exit_signal == False:
-        time.sleep(1)
         tick(view, player)
     listener.join() # merge to one thread
     os.system('reset') # clean up the console

@@ -48,10 +48,10 @@ class Player:
             return None
         else:
             # default states when not playing a track are negative integers
-            curr_time = self.player.get_position() * 100
+            curr_time = self.player.get_time() / 1000 # time returned in ms
             if (curr_time < 0):
                 curr_time = 0
-            run_time = self.player.get_length() // 1000
+            run_time = self.player.get_length() / 1000
             if (run_time < 0):
                 run_time = 0
                 playing = False
