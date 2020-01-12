@@ -6,7 +6,7 @@ A drop-in Python replacement for the iPod classic using the Raspberry Pi.
 
 - [x] Play back .mp3 and .flac files
 
-- [ ] UI with current song and playback progress
+- [x] UI with current song and playback progress
 
 - [ ] Support for m3u playlists
 
