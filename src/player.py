@@ -28,7 +28,7 @@ class Player:
             for file in files:
                 filepath = os.path.join(dirpath, file)
                 _, ext = os.path.splitext(filepath)
-                if ext in cfg.filetypes:
+                if ext in cfg.file_types:
                     self.song_list.append(filepath)
                     self.song_idx_max += 1
 
@@ -47,10 +47,21 @@ class Player:
         if (not self.song_list) or (self.song_idx < 0):
             return None
         else:
-            info = {"title": self.__get_id3('title'),
+            # default states when not playing a track are negative integers
+            curr_time = self.player.get_position() * 100
+            if (curr_time < 0):
+                curr_time = 0
+            run_time = self.player.get_length() // 1000
+            if (run_time < 0):
+                run_time = 0
+                playing = False
+            else:
+                playing = True
+            info = {"playing": playing,
+                    "title": self.__get_id3('title'),
                     "artist": self.__get_id3('artist'),
-                    "curr_time": self.player.get_position(),
-                    "run_time": self.player.get_length()}
+                    "curr_time": curr_time,
+                    "run_time": run_time}
             return info
 
     def play(self):
