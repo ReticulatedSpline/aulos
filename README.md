@@ -1,10 +1,10 @@
 # openDAP
-A drop-in Python replacement for the iPod classic using the Raspberry Pi.
+A open source digital audio player program designed for the Raspberry Pi and a PiTFT display. Uses [VLC media player](https://en.wikipedia.org/wiki/VLC_media_player) for media playback and the [curses library](https://en.wikipedia.org/wiki/Curses_%28programming_library%29) for a text-based user interface.
 
 ## Roadmap
 ### v1
 
-- [x] Play back .mp3 and .flac files
+- [x] Play .mp3 and .flac files
 
 - [x] UI with current song and playback progress
 
