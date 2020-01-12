@@ -85,6 +85,9 @@ class View:
     def update_ui(self, metadata: dict):
         """Update track metadata and progress indicators."""
 
+        self.__clear_line(self.line1)
+        self.__clear_line(self.line2)
+        self.__clear_line(self.line3)
         if metadata is None:
             return
         else:
