@@ -1,8 +1,5 @@
-# configuration for openDAP
-
 # text strings
-version = '0.0.0.1'
-title = 'OpenDAP' + ' ' + version
+title = 'OpenDAP v0.0.0.1'
 no_media_en = "Nothing is playing!"
 no_load_en = "..."
 no_progress_en = "Cannot display progress."

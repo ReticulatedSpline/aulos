@@ -1,4 +1,4 @@
-import time, sys, os, threading
+import sys, os
 from pynput import keyboard
 from functools import partial
 
@@ -8,7 +8,7 @@ from player import Player
 
 exit_signal: bool = False
 def on_press(key: keyboard.KeyCode, view: View, player: Player):
-    """Handle keypresses. Deprecate for touchscreen eventually."""
+    """Handle input"""
     global exit_signal
     key = str(key).strip('\'')
     if str(key) == 'p':
@@ -32,9 +32,7 @@ def on_press(key: keyboard.KeyCode, view: View, player: Player):
     view.update_ui(player.get_metadata())
 
 def tick(view: View, player:Player):
-    """Periodic UI update. This would be better suited as a class method, but I'm unsure how to
-    do that without making the player and view classes cross-dependent. Could be part
-    of controller if refactored into an MVC architecture."""
+    """For functions run periodically"""
     metadata = player.get_metadata()
     view.update_ui(metadata)
 
