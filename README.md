@@ -12,7 +12,7 @@ An open source digital audio player program designed for the Raspberry Pi and a 
 
 - [ ] Support for .m3u playlists
 
-- [ ] Browse local library by artist, album, and m3u playlist
+- [ ] Browse local library by artist, album, genre, year, and .m3u playlists
 
 - [ ] Queue functionality
 
@@ -22,9 +22,9 @@ An open source digital audio player program designed for the Raspberry Pi and a 
 
 - [ ] View all ID3 tags and other song metadata
 
-- [ ] Ability to ID3 tags
+- [ ] Ability to edit ID3 tags
 
-- [ ] Ability to edit m3u playlists
+- [ ] Ability to edit .m3u playlists
 
 - [ ] Compatibility with the AdaFruit PiTFT touch display or hardware buttons
 
