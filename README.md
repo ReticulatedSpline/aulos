@@ -37,7 +37,7 @@ An open source digital audio player program designed for the Raspberry Pi and a 
 ## Recommended Hardware
 [Raspberry Pi 3 A+](https://www.adafruit.com/product/4027)
 
-[2.8 inch touchscreen display](https://www.adafruit.com/product/1601)
+[2.8 inch PiTFT touchscreen display](https://www.adafruit.com/product/1601)
 
 ## Development Setup
 1. Install [VLC](https://www.videolan.org/vlc/) if you don't have it already.
