@@ -28,7 +28,7 @@ def on_press(key: keyboard.KeyCode, view: View, player: Player):
         exit_signal = True
         del player
         del view
-        return False
+        return
     view.update_ui(player.get_metadata())
 
 def tick(view: View, player:Player):

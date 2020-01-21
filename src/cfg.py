@@ -10,5 +10,5 @@ time_sep_en = " of "
 # file types to scan for
 file_types = {'.mp3', '.flac'}
 
-# loading bar filler
+# progress bar filler
 prog_fill = '▒'

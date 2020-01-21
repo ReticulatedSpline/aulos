@@ -16,23 +16,23 @@ An open source digital audio player program designed for the Raspberry Pi and a 
 
 ### v2
 
-- [ ] View all ID3 tags and other song metadata
-
-- [ ] Ability to ID3 tags
-
-- [ ] Ability to edit m3u playlists
+- [ ] Compatibility with the AdaFruit PiTFT touch display and/or hardware buttons
 
 - [ ] Queue functionality
 
 - [ ] Log ID3 and m3u CRUD operations to support syncing back to a master library
 
-- [ ] Compatibility with the AdaFruit PiTFT touch display or hardware buttons
+- [ ] Investigate suitable batteries
+
+- [ ] Investigate suitable cases
 
 ### v3
 
-- [ ] Display album art
+- [ ] Ability to view and edit ID3 tags
 
-- [ ] Battery integration
+- [ ] Ability to edit m3u playlists
+
+- [ ] Display album art
 
 - [ ] Sync songs via WiFi and/or Bluetooth (with other openDAPs?)
 

@@ -9,7 +9,7 @@ class View:
         self.screen = curses.initscr()
         self.max_y_chars, self.max_x_chars = self.screen.getmaxyx()
 
-        self.__draw_border()
+        self._draw_border()
 
         self.line1 = self.max_y_chars - 4
         self.line2 = self.max_y_chars - 3
@@ -20,19 +20,19 @@ class View:
         """Restore the previous state of the terminal"""
         curses.endwin()
 
-    def __draw_border(self):
+    def _draw_border(self):
         self.screen.border(0)
         self.screen.addstr(0, (self.max_x_chars - len(cfg.title)) // 2, cfg.title)
 
-    def __set_cursor(self):
+    def _set_cursor(self):
         self.screen.move(2, len(cfg.prompt_en) + 2)
 
-    def __clear_line(self, line: int):
+    def _clear_line(self, line: int):
         self.screen.move(line, 1)
         self.screen.clrtoeol()
-        self.__draw_border()
+        self._draw_border()
 
-    def __strfdelta(self, tdelta: timedelta):
+    def _strfdelta(self, tdelta: timedelta):
         """Format a timedelta into a string"""
         days = tdelta.days
         hours, rem = divmod(tdelta.seconds, 3600)
@@ -50,7 +50,7 @@ class View:
         time_str += str(seconds)
         return time_str
 
-    def __update_progress_info(self, metadata):
+    def _update_progress_info(self, metadata):
         if metadata is None:
             return
 
@@ -61,8 +61,8 @@ class View:
             return
 
         percent = int((curr_time / run_time) * 100)
-        run_time_str = self.__strfdelta(timedelta(seconds=run_time))
-        curr_time_str = self.__strfdelta(timedelta(seconds=curr_time))
+        run_time_str = self._strfdelta(timedelta(seconds=run_time))
+        curr_time_str = self._strfdelta(timedelta(seconds=curr_time))
         time_str = curr_time_str + cfg.time_sep_en + run_time_str + ' (' + str(percent) + '%)'
 
         # two border characters
@@ -77,17 +77,17 @@ class View:
 
     def notify(self, string: str):
         """Add a string to the top of the window."""
-        self.__clear_line(1)
+        self._clear_line(1)
         self.screen.addstr(1, 1, string)
-        self.__set_cursor()
+        self._set_cursor()
         self.screen.refresh()
 
     def update_ui(self, metadata: dict):
         """Update track metadata and progress indicators."""
 
-        self.__clear_line(self.line1)
-        self.__clear_line(self.line2)
-        self.__clear_line(self.line3)
+        self._clear_line(self.line1)
+        self._clear_line(self.line2)
+        self._clear_line(self.line3)
         if metadata is None:
             return
         else:
@@ -95,7 +95,7 @@ class View:
                 info_line = metadata['title'] + cfg.song_sep_en + metadata['artist']
                 self.screen.addstr(self.line1, 1, info_line)
             self.screen.addstr(2, 1, cfg.prompt_en)
-            self.__update_progress_info(metadata)
-        self.__draw_border()
-        self.__set_cursor()
+            self._update_progress_info(metadata)
+        self._draw_border()
+        self._set_cursor()
         self.screen.refresh()
