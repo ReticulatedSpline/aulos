@@ -4,7 +4,7 @@ An open source digital audio player program designed for the Raspberry Pi and a 
 ![screen capture of openDAP's textual interface](https://i.imgur.com/6k4LK09.png)
 
 ## Roadmap
-### v1
+### v1: Basic DAP functionality
 
 - [x] Play .mp3 and .flac files
 
@@ -12,34 +12,34 @@ An open source digital audio player program designed for the Raspberry Pi and a 
 
 - [ ] Support for .m3u playlists
 
-- [ ] Browse local library by artist, album, and m3u playlist
-
-### v2
-
-- [ ] Compatibility with the AdaFruit PiTFT touch display and/or hardware buttons
+- [ ] Browse library by artist, album, genre, year, and .m3u playlists
 
 - [ ] Queue functionality
 
-- [ ] Log ID3 and m3u CRUD operations to support syncing back to a master library
+### v2: Portability 
+
+- [ ] Compatibility with the AdaFruit PiTFT touch display and/or hardware buttons
 
 - [ ] Investigate suitable batteries
 
 - [ ] Investigate suitable cases
 
-### v3
+### v3: Extras
 
-- [ ] Ability to view and edit ID3 tags
+- [ ] Ability to view/edit all ID3 tags
 
-- [ ] Ability to edit m3u playlists
+- [ ] Ability to edit .m3u playlists
 
 - [ ] Display album art
 
 - [ ] Sync songs via WiFi and/or Bluetooth (with other openDAPs?)
 
 ## Recommended Hardware
+While running on this hardware is the long-term goal, note that openDAP should run on any *nix terminal.
+
 [Raspberry Pi 3 A+](https://www.adafruit.com/product/4027)
 
-[2.8 inch touchscreen display](https://www.adafruit.com/product/1601)
+[2.8 inch PiTFT touchscreen display](https://www.adafruit.com/product/1601)
 
 ## Development Setup
 1. Install [VLC](https://www.videolan.org/vlc/) if you don't have it already.
