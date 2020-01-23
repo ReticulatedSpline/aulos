@@ -6,10 +6,9 @@ import cfg
 from view import View
 from player import Player
 
-exit_signal: bool = False
+
 def on_press(key: keyboard.KeyCode, view: View, player: Player):
     """Handle input"""
-    global exit_signal
     key = str(key).strip('\'')
     if str(key) == 'p':
         view.notify('Playing...')
@@ -25,7 +24,6 @@ def on_press(key: keyboard.KeyCode, view: View, player: Player):
         player.skip_back()
     elif key == 'q':
         view.notify('Exiting...')
-        exit_signal = True
         return False
     view.update_ui(player.get_metadata())
 
@@ -46,8 +44,8 @@ def main():
             tick(view, player)
         del player
         del view
-        listener.join() # merge to one thread
-        os.system('reset') # clean up the console
+        listener.join()     # merge to one thread
+        os.system('reset')  # clean up the console
 
 
 if __name__ == "__main__":
