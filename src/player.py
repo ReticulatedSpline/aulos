@@ -8,7 +8,7 @@ playlist_path = os.path.abspath(os.path.join(__file__, '../../playlists'))
 
 
 class Player:
-    """Track player state, wrap calls to the VLC plugin, and handle scanning for media."""
+    """Track player state, wrap calls to VLC, and handle scanning for media."""
 
     def __init__(self):
         self.song_list = []
@@ -43,16 +43,16 @@ class Player:
             self.player.set_media(self.media)
 
     def get_metadata(self):
-        """Return a dictionary of title, artist, current runtime and total runtime."""
+        """Return a dictionary of title, artist, current/total runtimes."""
         if (not self.song_list) or (self.song_idx < 0):
             return None
         else:
             # default states when not playing a track are negative integers
-            curr_time = self.player.get_time() / 1000 # time returned in ms
-            if (curr_time < 0):
+            curr_time = self.player.get_time() / 1000   # time returned in ms
+            if curr_time < 0:
                 curr_time = 0
             run_time = self.player.get_length() / 1000
-            if (run_time < 0):
+            if run_time < 0:
                 run_time = 0
                 playing = False
             else:
@@ -74,14 +74,14 @@ class Player:
 
     def skip_forward(self):
         """Skip the the beginning of the next track and start playing."""
-        if (self.song_idx < self.song_idx_max):
+        if self.song_idx < self.song_idx_max:
             self.song_idx += 1
         self._update_song()
         self.play()
 
     def skip_back(self):
         """Skip to the beginning of the last track and start playing."""
-        if (self.song_idx > 0):
+        if self.song_idx > 0:
             self.song_idx -= 1
         self._update_song()
         self.play()

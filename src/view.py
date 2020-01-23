@@ -2,6 +2,7 @@ import cfg  # settings
 import curses  # textual user interface
 from datetime import timedelta
 
+
 class View:
     """Wrap the python Curses library and handle all aspects of the TUI."""
 
@@ -14,6 +15,7 @@ class View:
         self.line1 = self.max_y_chars - 4
         self.line2 = self.max_y_chars - 3
         self.line3 = self.max_y_chars - 2
+        self.notify("Initialized.")
         self.screen.refresh()
 
     def __del__(self):
@@ -22,7 +24,8 @@ class View:
 
     def _draw_border(self):
         self.screen.border(0)
-        self.screen.addstr(0, (self.max_x_chars - len(cfg.title)) // 2, cfg.title)
+        title_pos = (self.max_x_chars - len(cfg.title)) // 2
+        self.screen.addstr(0, title_pos, cfg.title)
 
     def _set_cursor(self):
         self.screen.move(2, len(cfg.prompt_en) + 2)
@@ -44,10 +47,7 @@ class View:
         if hours > 0:
             time_str += str(hours) + ' hours '
         time_str += str(minutes)
-        time_str += ':'
-        if (seconds < 10):
-            time_str += '0'
-        time_str += str(seconds)
+        time_str += f'{minutes}:{seconds:0>2}'
         return time_str
 
     def _update_progress_info(self, metadata):
@@ -63,7 +63,8 @@ class View:
         percent = int((curr_time / run_time) * 100)
         run_time_str = self._strfdelta(timedelta(seconds=run_time))
         curr_time_str = self._strfdelta(timedelta(seconds=curr_time))
-        time_str = curr_time_str + cfg.time_sep_en + run_time_str + ' (' + str(percent) + '%)'
+        percent_str = ' (' + str(percent) + '%)'
+        time_str = curr_time_str + cfg.time_sep_en + run_time_str + percent_str
 
         # two border characters
         progress_bar_chars = self.max_x_chars - 2

@@ -1,13 +1,14 @@
-import sys, os
-from pynput import keyboard
+import os
 from functools import partial
+from pynput.keyboard import Listener
+from pynput.keyboard import KeyCode as Key
 
 import cfg
 from view import View
 from player import Player
 
 
-def on_press(key: keyboard.KeyCode, view: View, player: Player):
+def on_press(key: Key, view: View, player: Player):
     """Handle input"""
     key = str(key).strip('\'')
     if str(key) == 'p':
@@ -24,8 +25,7 @@ def on_press(key: keyboard.KeyCode, view: View, player: Player):
         player.skip_back()
     elif key == 'q':
         view.notify('Exiting...')
-        return False
-    view.update_ui(player.get_metadata())
+        raise SystemExit
 
 
 def tick(view: View, player: Player):
@@ -37,15 +37,15 @@ def tick(view: View, player: Player):
 def main():
     view = View()
     player = Player()
-
-    view.notify("Ready!")
-    with keyboard.Listener(on_press=partial(on_press, view=view, player=player)) as listener:
-        while exit_signal is False:
+    listener = Listener(on_press=partial(on_press, view=view, player=player))
+    try:
+        listener.start()
+        while True:
             tick(view, player)
+    except SystemExit:
+        listener.stop()
         del player
         del view
-        listener.join()     # merge to one thread
-        os.system('reset')  # clean up the console
 
 
 if __name__ == "__main__":
