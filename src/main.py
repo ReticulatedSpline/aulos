@@ -25,7 +25,8 @@ def on_press(key: Key, view: View, player: Player):
         player.skip_back()
     elif key == 'q':
         view.notify('Exiting...')
-        raise SystemExit
+        return False
+    return True
 
 
 def tick(view: View, player: Player):
@@ -38,14 +39,11 @@ def main():
     view = View()
     player = Player()
     listener = Listener(on_press=partial(on_press, view=view, player=player))
-    try:
-        listener.start()
-        while True:
-            tick(view, player)
-    except SystemExit:
-        listener.stop()
-        del player
-        del view
+    listener.start()
+    while listener.running:
+        tick(view, player)
+    del player
+    del view
 
 
 if __name__ == "__main__":
