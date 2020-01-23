@@ -26,22 +26,29 @@ def on_press(key: keyboard.KeyCode, view: View, player: Player):
     elif key == 'q':
         view.notify('Exiting...')
         exit_signal = True
-        del player
-        del view
-        return
+        return False
     view.update_ui(player.get_metadata())
 
-def tick(view: View, player:Player):
+
+def tick(view: View, player: Player):
     """For functions run periodically"""
     metadata = player.get_metadata()
     view.update_ui(metadata)
 
-view = View()
-player = Player()
 
-view.notify("Ready!")
-with keyboard.Listener(on_press=partial(on_press, view=view, player=player)) as listener:
-    while exit_signal == False:
-        tick(view, player)
-    listener.join() # merge to one thread
-    os.system('reset') # clean up the console
+def main():
+    view = View()
+    player = Player()
+
+    view.notify("Ready!")
+    with keyboard.Listener(on_press=partial(on_press, view=view, player=player)) as listener:
+        while exit_signal is False:
+            tick(view, player)
+        del player
+        del view
+        listener.join() # merge to one thread
+        os.system('reset') # clean up the console
+
+
+if __name__ == "__main__":
+    main()
