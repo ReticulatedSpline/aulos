@@ -10,7 +10,7 @@ An open source digital audio player program designed for the Raspberry Pi and a 
 
 - [x] UI with current song and playback progress
 
-- [ ] Support for .m3u playlists
+- [ ] Menu navigation
 
 - [ ] Browse library by artist, album, genre, year, and .m3u playlists
 
@@ -25,6 +25,10 @@ An open source digital audio player program designed for the Raspberry Pi and a 
 - [ ] Investigate suitable cases
 
 ### v3: Extras
+
+- [ ] Shuffling and looping
+
+- [ ] Quick scrolling
 
 - [ ] Ability to view/edit all ID3 tags
 
