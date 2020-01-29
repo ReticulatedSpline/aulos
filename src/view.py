@@ -1,10 +1,10 @@
 import cfg  # settings
 import curses  # textual user interface
 from datetime import timedelta
-from enum import Enum
+from enum import IntEnum
 
 
-class Menus(Enum):
+class Menus(IntEnum):
     HOME = 1
     PLAYLISTS = 2
     ALBUMS = 3
@@ -14,7 +14,7 @@ class Menus(Enum):
     SETTINGS = 7
 
 
-class Nav(Enum):
+class Direction(IntEnum):
     UP = 1
     DOWN = 2
     SELECT = 3
@@ -112,17 +112,17 @@ class View:
         self.screen.addstr(self.status_y_loc, 1, string)
         self.screen.refresh()
 
-    def navigate(self, direction: Nav):
-        if direction == Nav.UP:
+    def navigate(self, direction: Direction):
+        if direction is Direction.UP:
             if self.menu_loc > 0:
                 self.menu_loc = self.menu_loc - 1
-        elif direction == Nav.DOWN:
+        elif direction is Direction.DOWN:
             if self.menu_loc < len(cfg.home_menu_items):
                 self.menu_loc = self.menu_loc + 1
-        elif direction == Nav.SELECT:
+        elif direction is Direction.SELECT:
             # TODO
             pass
-        elif direction == Nav.BACK:
+        elif direction is Direction.BACK:
             # TODO
             pass
 
@@ -142,4 +142,5 @@ class View:
             self.screen.addstr(self.metadata_y_loc, 1, song_info)
             self._draw_progress_info(metadata)
         self._draw_border()
+        self._draw_home_menu()
         self.screen.refresh()

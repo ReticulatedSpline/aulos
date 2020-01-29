@@ -3,7 +3,7 @@ from functools import partial
 from pynput.keyboard import Listener, KeyCode, Key
 
 import cfg
-from view import View
+from view import View, Direction
 from player import Player
 
 
@@ -28,12 +28,16 @@ def on_press(key: KeyCode, view: View, player: Player):
     else:
         if key == Key.up:
             view.notify('Navigate up')
+            view.navigate(Direction.UP)
         elif key == Key.down:
             view.notify('Navigate down')
+            view.navigate(Direction.DOWN)
         elif key == Key.right:
-            view.notify('Navigate forward')
+            view.notify('Navigate select')
+            view.navigate(Direction.SELECT)
         elif key == Key.left:
             view.notify('Navigate back')
+            view.navigate(Direction.BACK)
     return True
 
 
