@@ -1,31 +1,39 @@
 import os
 from functools import partial
-from pynput.keyboard import Listener
-from pynput.keyboard import KeyCode as Key
+from pynput.keyboard import Listener, KeyCode, Key
 
 import cfg
 from view import View
 from player import Player
 
 
-def on_press(key: Key, view: View, player: Player):
-    """Handle input"""
-    key = str(key).strip('\'')
-    if str(key) == 'p':
-        view.notify('Playing...')
-        player.play()
-    elif key == 'a':
-        view.notify('Paused')
-        player.pause()
-    elif key == 'n':
-        view.notify('Skipping Forward...')
-        player.skip_forward()
-    elif key == 'l':
-        view.notify('Skipping Back...')
-        player.skip_back()
-    elif key == 'q':
-        view.notify('Exiting...')
-        return False
+def on_press(key: KeyCode, view: View, player: Player):
+    """Callback for handling user input."""
+    if hasattr(key, 'char'):
+        if key.char == 'p':
+            view.notify('Play')
+            player.play()
+        elif key.char == 'a':
+            view.notify('Pause')
+            player.pause()
+        elif key.char == 'n':
+            view.notify('Skip forward')
+            player.skip_forward()
+        elif key.char == 'l':
+            view.notify('Skip Back')
+            player.skip_back()
+        elif key.char == 'q':
+            view.notify('Exit')
+            return False
+    else:
+        if key == Key.up:
+            view.notify('Navigate up')
+        elif key == Key.down:
+            view.notify('Navigate down')
+        elif key == Key.right:
+            view.notify('Navigate forward')
+        elif key == Key.left:
+            view.notify('Navigate back')
     return True
 
 

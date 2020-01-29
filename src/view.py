@@ -6,12 +6,19 @@ from enum import Enum
 
 class Menus(Enum):
     HOME = 1
-    SETTINGS = 2
-    PLAYLISTS = 4
-    ALBUMS = 5
-    ARTISTS = 6
-    GENRES = 7
-    TRACKS = 8
+    PLAYLISTS = 2
+    ALBUMS = 3
+    ARTISTS = 4
+    GENRES = 5
+    TRACKS = 6
+    SETTINGS = 7
+
+
+class Nav(Enum):
+    UP = 1
+    DOWN = 2
+    SELECT = 3
+    BACK = 4
 
 
 class View:
@@ -22,22 +29,21 @@ class View:
         curses.curs_set(0)  # make the cursor invisible
         self.max_y_chars, self.max_x_chars = self.screen.getmaxyx()
         self.menu_loc = 0
-        self.menu_stack = list()
 
         # y positions of persistant screen elements
-        self.screen.hline('-', self.max_y_chars - 6, 1)
         self.status_y_loc = self.max_y_chars - 5
         self.metadata_y_loc = self.max_y_chars - 4
         self.time_y_loc = self.max_y_chars - 3
         self.prog_y_loc = self.max_y_chars - 2
 
-        self.notify("Initialized.")
+        self.notify("Ready")
         self._draw_home_menu()
         self._draw_border()
-        self.screen.refresh()
+        self.update_ui(None)
 
     def __del__(self):
         """Restore the previous state of the terminal"""
+        curses.curs_set(1)
         curses.endwin()
 
     def _draw_border(self):
@@ -67,8 +73,11 @@ class View:
 
     def _draw_home_menu(self):
         y_loc = 1
-        for menu in cfg.home_menu_str:
-            self.screen.addstr(y_loc, 1, menu)
+        for idx, menu_item in enumerate(cfg.home_menu_items):
+            if idx == self.menu_loc:  # invert color of selected item
+                self.screen.addstr(y_loc, 1, menu_item, curses.A_REVERSE)
+            else:
+                self.screen.addstr(y_loc, 1, menu_item)
             y_loc += 1
 
     def _draw_progress_info(self, metadata):
@@ -103,6 +112,20 @@ class View:
         self.screen.addstr(self.status_y_loc, 1, string)
         self.screen.refresh()
 
+    def navigate(self, direction: Nav):
+        if direction == Nav.UP:
+            if self.menu_loc > 0:
+                self.menu_loc = self.menu_loc - 1
+        elif direction == Nav.DOWN:
+            if self.menu_loc < len(cfg.home_menu_items):
+                self.menu_loc = self.menu_loc + 1
+        elif direction == Nav.SELECT:
+            # TODO
+            pass
+        elif direction == Nav.BACK:
+            # TODO
+            pass
+
     def update_ui(self, metadata: dict):
         """Update track metadata and progress indicators."""
 
@@ -110,12 +133,13 @@ class View:
         self._clear_line(self.time_y_loc)
         self._clear_line(self.prog_y_loc)
 
-        if metadata is None:
-            return
+        if (metadata is None) or (not metadata['playing']):
+            self.screen.addstr(self.metadata_y_loc, 1, cfg.no_media_str)
+            self.screen.addstr(self.prog_y_loc, 1, cfg.no_load_str)
+            self.screen.addstr(self.time_y_loc, 1, cfg.no_load_str)
         else:
-            if metadata['playing']:
-                song_info = metadata['title'] + cfg.song_sep_str + metadata['artist']
-                self.screen.addstr(self.metadata_y_loc, 1, song_info)
+            song_info = metadata['title'] + cfg.song_sep_str + metadata['artist']
+            self.screen.addstr(self.metadata_y_loc, 1, song_info)
             self._draw_progress_info(metadata)
         self._draw_border()
         self.screen.refresh()
