@@ -10,7 +10,7 @@ An open source digital audio player designed for the Raspberry Pi and a PiTFT di
 
 - [x] UI with current song and playback progress
 
-- [ ] Menu navigation
+- [x] Menu navigation
 
 - [ ] Browse library by artist, album, genre, year, and .m3u playlists
 
