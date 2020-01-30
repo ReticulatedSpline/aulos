@@ -1,17 +1,17 @@
-import cfg  # settings
-import curses  # textual user interface
+import cfg
+import curses
 from datetime import timedelta
 from enum import IntEnum
 
 
-class Menus(IntEnum):
-    HOME = 1
-    PLAYLISTS = 2
-    ALBUMS = 3
-    ARTISTS = 4
-    GENRES = 5
-    TRACKS = 6
-    SETTINGS = 7
+class Menu(IntEnum):
+    PLAYLISTS = 1
+    ALBUMS = 2
+    ARTISTS = 3
+    GENRES = 4
+    TRACKS = 5
+    SETTINGS = 6
+    EXIT = 7
 
 
 class Direction(IntEnum):
@@ -38,7 +38,7 @@ class View:
 
         self.notify("Ready")
         self._draw_home_menu()
-        self._draw_border()
+        self._draw_borders()
         self.update_ui(None)
 
     def __del__(self):
@@ -46,15 +46,21 @@ class View:
         curses.curs_set(1)
         curses.endwin()
 
-    def _draw_border(self):
+    def _draw_borders(self):
         self.screen.border(0)
         title_pos = (self.max_x_chars - len(cfg.title_str)) // 2
         self.screen.addstr(0, title_pos, cfg.title_str)
+        middle_border_y_loc = self.status_y_loc - 1
+        # draw connecting characters from extended curses set
+        self.screen.addch(middle_border_y_loc, 0, curses.ACS_LTEE)
+        self.screen.addch(middle_border_y_loc, self.max_x_chars - 1, curses.ACS_RTEE)
+        # draw middle border line
+        self.screen.hline(middle_border_y_loc, 1, curses.ACS_HLINE, self.max_x_chars - 2)
 
     def _clear_line(self, line: int):
         self.screen.move(line, 1)
         self.screen.clrtoeol()
-        self._draw_border()
+        self._draw_borders()
 
     def _strfdelta(self, tdelta: timedelta):
         """Format a timedelta into a string"""
@@ -113,6 +119,7 @@ class View:
         self.screen.refresh()
 
     def navigate(self, direction: Direction):
+        """Handle a menu selection. Returns False if exiting program, else True."""
         if direction is Direction.UP:
             if self.menu_loc > 1:
                 self.menu_loc = self.menu_loc - 1
@@ -120,11 +127,12 @@ class View:
             if self.menu_loc < len(cfg.home_menu_items):
                 self.menu_loc = self.menu_loc + 1
         elif direction is Direction.SELECT:
-            # TODO
-            pass
+            if self.menu_loc == Menu.EXIT:
+                return False
         elif direction is Direction.BACK:
             # TODO
             pass
+        return True
 
     def update_ui(self, metadata: dict):
         """Update track metadata and progress indicators."""
@@ -141,6 +149,6 @@ class View:
             song_info = metadata['title'] + cfg.song_sep_str + metadata['artist']
             self.screen.addstr(self.metadata_y_loc, 1, song_info)
             self._draw_progress_info(metadata)
-        self._draw_border()
+        self._draw_borders()
         self._draw_home_menu()
         self.screen.refresh()
