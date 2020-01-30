@@ -28,7 +28,7 @@ class View:
         self.screen = curses.initscr()
         curses.curs_set(0)  # make the cursor invisible
         self.max_y_chars, self.max_x_chars = self.screen.getmaxyx()
-        self.menu_loc = 0
+        self.menu_loc = 1
 
         # y positions of persistant screen elements
         self.status_y_loc = self.max_y_chars - 5
@@ -72,13 +72,13 @@ class View:
         return time_str
 
     def _draw_home_menu(self):
-        y_loc = 1
-        for idx, menu_item in enumerate(cfg.home_menu_items):
+        for idx, menu_item in enumerate(cfg.home_menu_items, start=1):
+            # white space is full width with menu item and border subtracted
+            white_space = ' ' * (self.max_x_chars - len(menu_item) - 2)
             if idx == self.menu_loc:  # invert color of selected item
-                self.screen.addstr(y_loc, 1, menu_item, curses.A_REVERSE)
+                self.screen.addstr(idx, 1, menu_item + white_space, curses.A_REVERSE)
             else:
-                self.screen.addstr(y_loc, 1, menu_item)
-            y_loc += 1
+                self.screen.addstr(idx, 1, menu_item + white_space)
 
     def _draw_progress_info(self, metadata):
         if metadata is None:
@@ -114,7 +114,7 @@ class View:
 
     def navigate(self, direction: Direction):
         if direction is Direction.UP:
-            if self.menu_loc > 0:
+            if self.menu_loc > 1:
                 self.menu_loc = self.menu_loc - 1
         elif direction is Direction.DOWN:
             if self.menu_loc < len(cfg.home_menu_items):
