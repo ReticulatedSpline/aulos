@@ -1,7 +1,8 @@
 import cfg
 import curses
-from datetime import timedelta
+import glob
 from enum import IntEnum
+from datetime import timedelta
 
 
 class Menu(IntEnum):
@@ -10,8 +11,9 @@ class Menu(IntEnum):
     ARTISTS = 3
     GENRES = 4
     TRACKS = 5
-    SETTINGS = 6
-    EXIT = 7
+    QUEUE = 6
+    SETTINGS = 7
+    EXIT = 8
 
 
 class Direction(IntEnum):
@@ -28,6 +30,8 @@ class View:
         self.screen = curses.initscr()
         curses.curs_set(0)  # make the cursor invisible
         self.max_y_chars, self.max_x_chars = self.screen.getmaxyx()
+        # number of rows not taken up by borders or current song info
+        self.free_y_chars = self.max_y_chars - 6
         self.menu_loc = 1
 
         # y positions of persistant screen elements
@@ -62,6 +66,11 @@ class View:
         self.screen.clrtoeol()
         self._draw_borders()
 
+    def _clear_menu_lines(self):
+        for line in list(range(1, self.free_y_chars)):
+            self._clear_line(line)
+        self.screen.refresh()
+
     def _strfdelta(self, tdelta: timedelta):
         """Format a timedelta into a string"""
         days = tdelta.days
@@ -85,6 +94,7 @@ class View:
                 self.screen.addstr(idx, 1, menu_item + white_space, curses.A_REVERSE)
             else:
                 self.screen.addstr(idx, 1, menu_item + white_space)
+        self.screen.refresh()
 
     def _draw_progress_info(self, metadata):
         if metadata is None:
@@ -112,6 +122,14 @@ class View:
         self.screen.addstr(self.time_y_loc, 1, time_str)
         self.screen.addstr(self.prog_y_loc, 1, progress_bar)
 
+    def _draw_playlists(self):
+        self._clear_menu_lines()
+
+        playlists = glob.glob(cfg.playlist_dir)
+        for idx, playlist in enumerate(playlists, start=1):
+            self.screen.addstr(idx, 1, str(playlist))
+        self.screen.refresh()
+
     def notify(self, string: str):
         """Add a string to the window. Persistant until overwritten"""
         self._clear_line(self.status_y_loc)
@@ -129,9 +147,22 @@ class View:
         elif direction is Direction.SELECT:
             if self.menu_loc == Menu.EXIT:
                 return False
+            elif self.menu_loc == Menu.PLAYLISTS:
+                self._draw_playlists()
+            elif self.menu_loc == Menu.ALBUMS:
+                self.notify("Not yet implemented!")
+            elif self.menu_loc == Menu.ARTISTS:
+                self.notify("Not yet implemented!")
+            elif self.menu_loc == Menu.GENRES:
+                self.notify("Not yet implemented!")
+            elif self.menu_loc == Menu.TRACKS:
+                self.notify("Not yet implemented!")
+            elif self.menu_loc == Menu.QUEUE:
+                self.notify("Not yet implemented!")
+            elif self.menu_loc == Menu.SETTINGS:
+                self.notify("Not yet implemented!")
         elif direction is Direction.BACK:
-            # TODO
-            pass
+            self._draw_home_menu()
         return True
 
     def update_ui(self, metadata: dict):
@@ -150,5 +181,4 @@ class View:
             self.screen.addstr(self.metadata_y_loc, 1, song_info)
             self._draw_progress_info(metadata)
         self._draw_borders()
-        self._draw_home_menu()
         self.screen.refresh()
