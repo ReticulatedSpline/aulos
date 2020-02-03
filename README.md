@@ -4,7 +4,6 @@ An open source digital audio player designed for the Raspberry Pi and based on t
 ![screen capture of OpenDAP's textual interface](https://i.imgur.com/6k4LK09.png)
 
 ## Roadmap
-### v1: Basic DAP functionality
 
 - [x] Play .mp3 and .flac audio files
 
@@ -12,11 +11,11 @@ An open source digital audio player designed for the Raspberry Pi and based on t
 
 - [x] Menu navigation
 
-- [ ] Browse library by artist, album, genre, year, and .m3u playlists
+- [ ] .m3u playlist support
+
+- [ ] Browse library by artist, album, genre, and year
 
 - [ ] Queue functionality
-
-### v2: Portability 
 
 - [ ] Compatibility with the AdaFruit PiTFT touch display and/or hardware buttons
 
@@ -24,13 +23,11 @@ An open source digital audio player designed for the Raspberry Pi and based on t
 
 - [ ] Investigate suitable cases
 
-### v3: Extras
-
 - [ ] Shuffling and looping
 
 - [ ] Quick scrolling
 
-- [ ] Ability to view/edit all ID3 tags
+- [ ] Ability to view/edit ID3 tags
 
 - [ ] Ability to edit .m3u playlists
 
