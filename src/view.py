@@ -1,11 +1,13 @@
-import cfg
-import curses
-import glob
+"""Functions and classes responsible for the user interface"""
 from enum import IntEnum
 from datetime import timedelta
-
+import curses
+import glob
+import cfg
 
 class Menu(IntEnum):
+    """Possible states of the view"""
+    HOME = 0
     PLAYLISTS = 1
     ALBUMS = 2
     ARTISTS = 3
@@ -15,8 +17,8 @@ class Menu(IntEnum):
     SETTINGS = 7
     EXIT = 8
 
-
 class Direction(IntEnum):
+    """Possible navigational directions"""
     UP = 1
     DOWN = 2
     SELECT = 3
@@ -33,12 +35,12 @@ class View:
         # number of rows not taken up by borders or current song info
         self.free_y_chars = self.max_y_chars - 6
         self.menu_loc = 1
-
-        # y positions of persistant screen elements
-        self.status_y_loc = self.max_y_chars - 5
-        self.metadata_y_loc = self.max_y_chars - 4
-        self.time_y_loc = self.max_y_chars - 3
-        self.prog_y_loc = self.max_y_chars - 2
+        self.y_indicies = {
+            'status': self.max_y_chars - 5,
+            'metadata': self.max_y_chars - 4,
+            'time': self.max_y_chars - 3,
+            'progress_bar': self.max_y_chars - 2
+        }
 
         self.notify("Ready")
         self._draw_home_menu()
@@ -54,12 +56,12 @@ class View:
         self.screen.border(0)
         title_pos = (self.max_x_chars - len(cfg.title_str)) // 2
         self.screen.addstr(0, title_pos, cfg.title_str)
-        middle_border_y_loc = self.status_y_loc - 1
+        middle_border = self.y_indicies['status'] - 1
         # draw connecting characters from extended curses set
-        self.screen.addch(middle_border_y_loc, 0, curses.ACS_LTEE)
-        self.screen.addch(middle_border_y_loc, self.max_x_chars - 1, curses.ACS_RTEE)
+        self.screen.addch(middle_border, 0, curses.ACS_LTEE)
+        self.screen.addch(middle_border, self.max_x_chars - 1, curses.ACS_RTEE)
         # draw middle border line
-        self.screen.hline(middle_border_y_loc, 1, curses.ACS_HLINE, self.max_x_chars - 2)
+        self.screen.hline(middle_border, 1, curses.ACS_HLINE, self.max_x_chars - 2)
 
     def _clear_line(self, line: int):
         self.screen.move(line, 1)
@@ -94,7 +96,6 @@ class View:
                 self.screen.addstr(idx, 1, menu_item + white_space, curses.A_REVERSE)
             else:
                 self.screen.addstr(idx, 1, menu_item + white_space)
-        self.screen.refresh()
 
     def _draw_progress_info(self, metadata):
         if metadata is None:
@@ -119,8 +120,8 @@ class View:
         progress_void = ' ' * (progress_bar_chars - fill_count)
         progress_bar = progress_fill + progress_void
 
-        self.screen.addstr(self.time_y_loc, 1, time_str)
-        self.screen.addstr(self.prog_y_loc, 1, progress_bar)
+        self.screen.addstr(self.y_indicies['time'], 1, time_str)
+        self.screen.addstr(self.y_indicies['progress_bar'], 1, progress_bar)
 
     def _draw_playlists(self):
         self._clear_menu_lines()
@@ -128,12 +129,11 @@ class View:
         playlists = glob.glob(cfg.playlist_dir)
         for idx, playlist in enumerate(playlists, start=1):
             self.screen.addstr(idx, 1, str(playlist))
-        self.screen.refresh()
 
     def notify(self, string: str):
         """Add a string to the window. Persistant until overwritten"""
-        self._clear_line(self.status_y_loc)
-        self.screen.addstr(self.status_y_loc, 1, string)
+        self._clear_line(self.y_indicies['status'])
+        self.screen.addstr(self.y_indicies['status'], 1, string)
         self.screen.refresh()
 
     def navigate(self, direction: Direction):
@@ -168,17 +168,17 @@ class View:
     def update_ui(self, metadata: dict):
         """Update track metadata and progress indicators."""
 
-        self._clear_line(self.metadata_y_loc)
-        self._clear_line(self.time_y_loc)
-        self._clear_line(self.prog_y_loc)
+        self._clear_line(self.y_indicies['metadata'])
+        self._clear_line(self.y_indicies['time'])
+        self._clear_line(self.y_indicies['progress_bar'])
 
         if (metadata is None) or (not metadata['playing']):
-            self.screen.addstr(self.metadata_y_loc, 1, cfg.no_media_str)
-            self.screen.addstr(self.prog_y_loc, 1, cfg.no_load_str)
-            self.screen.addstr(self.time_y_loc, 1, cfg.no_load_str)
+            self.screen.addstr(self.y_indicies['metadata'], 1, cfg.no_media_str)
+            self.screen.addstr(self.y_indicies['progress_bar'], 1, cfg.no_load_str)
+            self.screen.addstr(self.y_indicies['time'], 1, cfg.no_load_str)
         else:
             song_info = metadata['title'] + cfg.song_sep_str + metadata['artist']
-            self.screen.addstr(self.metadata_y_loc, 1, song_info)
+            self.screen.addstr(self.y_indicies['metadata'], 1, song_info)
             self._draw_progress_info(metadata)
-        self._draw_borders()
+        self._draw_home_menu()
         self.screen.refresh()
