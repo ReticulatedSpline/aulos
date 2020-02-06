@@ -134,7 +134,6 @@ class View:
 
     def _draw_playlists(self):
         self._clear_menu_lines()
-        self.notify("playlists")
         playlists = glob.glob(cfg.playlist_dir)
         for idx, playlist in enumerate(playlists, start=1):
             self.screen.addstr(idx, 1, str(playlist))
