@@ -36,7 +36,7 @@ An open source digital audio player designed for the Raspberry Pi and based on t
 - [ ] Sync songs via WiFi and/or Bluetooth (with other openDAPs?)
 
 ## Recommended Hardware
-While running on this hardware is the long-term goal, note that openDAP should run on any *nix terminal.
+While running on this hardware is the long-term goal, note that openDAP should run on any terminal emulator.
 
 [Raspberry Pi 3 A+](https://www.adafruit.com/product/4027)
 
