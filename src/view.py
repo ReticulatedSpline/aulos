@@ -4,6 +4,7 @@ from datetime import timedelta
 import collections
 import curses
 import glob
+import os
 import cfg
 
 
@@ -80,7 +81,11 @@ class View:
     def _clear_menu_lines(self):
         for line in list(range(1, self.free_y_chars)):
             self._clear_line(line)
-        self.screen.refresh()
+
+    def _clear_progress_lines(self):
+        self._clear_line(self.y_indicies['metadata'])
+        self._clear_line(self.y_indicies['time'])
+        self._clear_line(self.y_indicies['progress_bar'])
 
     def _strfdelta(self, tdelta: timedelta):
         """Format a timedelta into a string"""
@@ -134,9 +139,14 @@ class View:
 
     def _draw_playlists(self):
         self._clear_menu_lines()
-        playlists = glob.glob(cfg.playlist_dir)
+        display = self.menu_stack[-1]
+        playlist_dir = os.path.realpath(cfg.playlist_dir)
+        playlists = glob.glob(playlist_dir + '/*.m3u')
         for idx, playlist in enumerate(playlists, start=1):
-            self.screen.addstr(idx, 1, str(playlist))
+            if display.index == idx:
+                self.screen.addstr(idx, 1, os.path.basename(playlist), curses.A_REVERSE)
+            else:
+                self.screen.addstr(idx, 1, os.path.basename(playlist))
 
     def _handle_select(self, display: Display):
         if display.index == Menu.EXIT:
@@ -176,16 +186,15 @@ class View:
         elif direction is Direction.SELECT:
             return self._handle_select(display)
         elif direction is Direction.BACK:
-            self._draw_home_menu()
+            self.menu_stack.pop()
+            if len(self.menu_stack) < 1:
+                self.menu_stack.append(Display(menu.HOME, 0))
         return True
 
     def update_ui(self, metadata: dict):
         """Update track metadata and progress indicators."""
 
-        self._clear_line(self.y_indicies['metadata'])
-        self._clear_line(self.y_indicies['time'])
-        self._clear_line(self.y_indicies['progress_bar'])
-
+        self._clear_progress_lines()
         if (metadata is None) or (not metadata['playing']):
             self.screen.addstr(self.y_indicies['metadata'], 1, cfg.no_media_str)
             self.screen.addstr(self.y_indicies['progress_bar'], 1, cfg.no_load_str)
@@ -194,5 +203,10 @@ class View:
             song_info = metadata['title'] + cfg.song_sep_str + metadata['artist']
             self.screen.addstr(self.y_indicies['metadata'], 1, song_info)
             self._draw_progress_info(metadata)
-        self._draw_home_menu()
+
+        menu = self.menu_stack[-1].menu
+        if menu == Menu.HOME:
+            self._draw_home_menu()
+        elif menu == Menu.PLAYLISTS:
+            self._draw_playlists()
         self.screen.refresh()

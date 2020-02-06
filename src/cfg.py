@@ -3,8 +3,8 @@ import os
 # controls: [P]lay, P[a]use, [N]ext, [L]ast
 
 # directories
-music_dir = os.path.realpath("music")
-playlist_dir = os.path.realpath("playlists")
+music_dir = "music"
+playlist_dir = "playlists"
 
 # text strings
 title_str = 'OpenDAP v0.0.0.1'
