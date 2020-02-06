@@ -1,9 +1,11 @@
 """Functions and classes responsible for the user interface"""
 from enum import IntEnum
 from datetime import timedelta
+import collections
 import curses
 import glob
 import cfg
+
 
 class Menu(IntEnum):
     """Possible states of the view"""
@@ -17,6 +19,7 @@ class Menu(IntEnum):
     SETTINGS = 7
     EXIT = 8
 
+
 class Direction(IntEnum):
     """Possible navigational directions"""
     UP = 1
@@ -25,16 +28,22 @@ class Direction(IntEnum):
     BACK = 4
 
 
+Display = collections.namedtuple('display', 'menu index')
+
+
 class View:
     """Wrap the python Curses library and handle all aspects of the TUI."""
 
     def __init__(self):
         self.screen = curses.initscr()
-        curses.curs_set(0)  # make the cursor invisible
+        # make the cursor invisible if supported
+        curses.curs_set(False)
+
         self.max_y_chars, self.max_x_chars = self.screen.getmaxyx()
         # number of rows not taken up by borders or current song info
         self.free_y_chars = self.max_y_chars - 6
-        self.menu_loc = 1
+        self.menu_stack = list()
+        self.menu_stack.append(Display(Menu.HOME, 1))
         self.y_indicies = {
             'status': self.max_y_chars - 5,
             'metadata': self.max_y_chars - 4,
@@ -89,10 +98,10 @@ class View:
         return time_str
 
     def _draw_home_menu(self):
+        """Draw the list of home menu options with the current selection highlighted"""
         for idx, menu_item in enumerate(cfg.home_menu_items, start=1):
-            # white space is full width with menu item and border subtracted
             white_space = ' ' * (self.max_x_chars - len(menu_item) - 2)
-            if idx == self.menu_loc:  # invert color of selected item
+            if idx == self.menu_stack[-1].index:
                 self.screen.addstr(idx, 1, menu_item + white_space, curses.A_REVERSE)
             else:
                 self.screen.addstr(idx, 1, menu_item + white_space)
@@ -125,10 +134,30 @@ class View:
 
     def _draw_playlists(self):
         self._clear_menu_lines()
-
+        self.notify("playlists")
         playlists = glob.glob(cfg.playlist_dir)
         for idx, playlist in enumerate(playlists, start=1):
             self.screen.addstr(idx, 1, str(playlist))
+
+    def _handle_select(self, display: Display):
+        if display.index == Menu.EXIT:
+            return False
+        elif display.index == Menu.PLAYLISTS:
+            self._draw_playlists()
+            self.menu_stack.append(Display(Menu.PLAYLISTS, 0))
+        elif display.index == Menu.ALBUMS:
+            self.notify("Not yet implemented!")
+        elif display.index == Menu.ARTISTS:
+            self.notify("Not yet implemented!")
+        elif display.index == Menu.GENRES:
+            self.notify("Not yet implemented!")
+        elif display.index == Menu.TRACKS:
+            self.notify("Not yet implemented!")
+        elif display.index == Menu.QUEUE:
+            self.notify("Not yet implemented!")
+        elif display.index == Menu.SETTINGS:
+            self.notify("Not yet implemented!")
+        return True
 
     def notify(self, string: str):
         """Add a string to the window. Persistant until overwritten"""
@@ -138,29 +167,15 @@ class View:
 
     def navigate(self, direction: Direction):
         """Handle a menu selection. Returns False if exiting program, else True."""
+        display = self.menu_stack[-1]
         if direction is Direction.UP:
-            if self.menu_loc > 1:
-                self.menu_loc = self.menu_loc - 1
+            if display.index > 1:
+                self.menu_stack.append(Display(display.menu, display.index - 1))
         elif direction is Direction.DOWN:
-            if self.menu_loc < len(cfg.home_menu_items):
-                self.menu_loc = self.menu_loc + 1
+            if display.index < len(cfg.home_menu_items):
+                self.menu_stack.append(Display(display.menu, display.index + 1))
         elif direction is Direction.SELECT:
-            if self.menu_loc == Menu.EXIT:
-                return False
-            elif self.menu_loc == Menu.PLAYLISTS:
-                self._draw_playlists()
-            elif self.menu_loc == Menu.ALBUMS:
-                self.notify("Not yet implemented!")
-            elif self.menu_loc == Menu.ARTISTS:
-                self.notify("Not yet implemented!")
-            elif self.menu_loc == Menu.GENRES:
-                self.notify("Not yet implemented!")
-            elif self.menu_loc == Menu.TRACKS:
-                self.notify("Not yet implemented!")
-            elif self.menu_loc == Menu.QUEUE:
-                self.notify("Not yet implemented!")
-            elif self.menu_loc == Menu.SETTINGS:
-                self.notify("Not yet implemented!")
+            return self._handle_select(display)
         elif direction is Direction.BACK:
             self._draw_home_menu()
         return True

@@ -3,9 +3,6 @@ import vlc  # swiss army knife of media players
 import cfg
 from mutagen.easyid3 import EasyID3 as ID3  # audio file metadata
 
-music_path = os.path.abspath(os.path.join(__file__, '../../music'))
-playlist_path = os.path.abspath(os.path.join(__file__, '../../playlists'))
-
 
 class Player:
     """Track player state, wrap calls to VLC, and handle scanning for media."""
@@ -24,7 +21,7 @@ class Player:
         return
 
     def _scan_library(self):
-        for dirpath, _, files in os.walk(music_path):
+        for dirpath, _, files in os.walk(cfg.music_dir):
             for file in files:
                 filepath = os.path.join(dirpath, file)
                 _, ext = os.path.splitext(filepath)

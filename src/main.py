@@ -5,6 +5,7 @@ from pynput.keyboard import Listener, KeyCode, Key
 from view import View, Direction
 from player import Player
 
+
 def on_press(key: KeyCode, view: View, player: Player):
     """Callback for handling user input."""
     if hasattr(key, 'char'):
@@ -27,10 +28,12 @@ def on_press(key: KeyCode, view: View, player: Player):
             view.navigate(Direction.BACK)
     return True
 
+
 def tick(view: View, player: Player):
     """For functions run periodically"""
     metadata = player.get_metadata()
     view.update_ui(metadata)
+
 
 def main():
     """Entry point. Creates two threads."""
@@ -42,6 +45,7 @@ def main():
         tick(view, player)
     del player
     del view
-    os.system('cls' if os.name == 'nt' else 'clear')
+
+
 if __name__ == "__main__":
     main()
