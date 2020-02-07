@@ -145,9 +145,9 @@ class View:
         self._clear_menu_lines()
         display = self.menu_stack[-1]
         playlist_dir = os.path.realpath(cfg.playlist_dir)
-        playlists = glob.glob(playlist_dir + '/*.m3u')
-        for idx, playlist in enumerate(playlists, start=1):
-            if display.index == idx:
+        playlist_path = glob.glob(playlist_dir + '/*.m3u')
+        for idx, playlist in enumerate(playlist_path, start=1):
+            if display.index + 1 == idx:
                 self.screen.addstr(idx, 1, os.path.basename(playlist), curses.A_REVERSE)
             else:
                 self.screen.addstr(idx, 1, os.path.basename(playlist))
