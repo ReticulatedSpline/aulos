@@ -1,8 +1,6 @@
 # OpenDAP
 An open source digital audio player designed for the Raspberry Pi and based on the venerable [VLC media player](https://en.wikipedia.org/wiki/VLC_media_player). Local storage means your music is accessable even when you're without internet, which should be ideal for users who find themselves on the moon, or stuck in the '70s. OpenDAP is not tested on animals.
 
-![screen capture of OpenDAP's textual interface](https://i.imgur.com/6k4LK09.png)
-
 ## Roadmap
 
 - [x] Play .mp3 and .flac audio files
