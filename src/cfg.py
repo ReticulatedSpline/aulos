@@ -7,7 +7,7 @@ music_dir = "music"
 playlist_dir = "playlists"
 
 # text strings
-title_str = 'OpenDAP v0.0.0.1'
+homescreen_title_str = u'☭'
 no_media_str = "Nothing playing."
 no_load_str = "..."
 song_sep_str = " by "

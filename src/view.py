@@ -2,8 +2,8 @@
 from typing import NamedTuple
 from enum import IntEnum
 from datetime import timedelta
+from glob import glob
 import curses
-import glob
 import os
 import cfg
 
@@ -31,22 +31,21 @@ class Direction(IntEnum):
 class Display(NamedTuple):
     """hold all information necessary to draw a display"""
     menu_path: str
-    index: int
+    index: int = 0
+    start_index: int = 0
 
 
-def _strfdelta(self, tdelta: timedelta):
+def _strfdelta(tdelta: timedelta):
     """Format a timedelta into a string"""
     days = tdelta.days
     hours, rem = divmod(tdelta.seconds, 3600)
     minutes, seconds = divmod(rem, 60)
 
-    time_str = ''
+    time_str = f'{minutes}:{seconds:0>2}'
     if days > 0:
         time_str += str(days) + ' days, '
     if hours > 0:
         time_str += str(hours) + ' hours '
-    time_str += str(minutes)
-    time_str += f'{minutes}:{seconds:0>2}'
     return time_str
 
 
@@ -97,8 +96,15 @@ class View:
 
     def _draw_borders(self):
         self.screen.border(0)
-        title_pos = (self.max_x_chars - len(cfg.title_str)) // 2
-        self.screen.addstr(0, title_pos, cfg.title_str)
+        menu_path = self.menu_stack[-1].menu_path
+        if menu_path.endswith('home'):
+            title = ' ' + cfg.homescreen_title_str + ' '
+        else:
+            title = ' ' + menu_path[5:] + ' '
+        title_pos = (self.max_x_chars - len(title)) // 2
+        self.screen.addstr(0, title_pos, title)
+        self.screen.addch(0, title_pos - 1, curses.ACS_RTEE)
+        self.screen.addch(0, title_pos + len(title), curses.ACS_LTEE)
         middle_border = self.y_indicies['status'] - 1
         # draw connecting characters from extended curses set
         self.screen.addch(middle_border, 0, curses.ACS_LTEE)
@@ -145,12 +151,28 @@ class View:
         self._clear_menu_lines()
         display = self.menu_stack[-1]
         playlist_dir = os.path.realpath(cfg.playlist_dir)
-        playlist_path = glob.glob(playlist_dir + '/*.m3u')
-        for idx, playlist in enumerate(playlist_path, start=1):
-            if display.index + 1 == idx:
+        playlists = glob(playlist_dir + '/*.m3u')
+        for idx, playlist in enumerate(playlists, start=1):
+            if idx >= self.free_y_chars:
+                break
+            elif display.index + 1 == idx:
                 self.screen.addstr(idx, 1, os.path.basename(playlist), curses.A_REVERSE)
             else:
                 self.screen.addstr(idx, 1, os.path.basename(playlist))
+
+    def _draw_tracks(self):
+        self._clear_menu_lines()
+        display = self.menu_stack[-1]
+        track_dir = os.path.realpath(cfg.music_dir)
+        tracks = glob(track_dir + '/*.mp3') + glob(track_dir + '/*.flac')
+        for idx, track in enumerate(tracks, start=1):
+            if idx >= self.free_y_chars:
+                break
+            elif display.index + 1 == idx:
+                self.screen.addstr(idx, 1, os.path.basename(track), curses.A_REVERSE)
+            else:
+                self.screen.addstr(idx, 1, os.path.basename(track))
+            
 
     def _handle_home_select(self, display: Display):
         if display.index == Menu.EXIT:
@@ -165,6 +187,7 @@ class View:
         elif display.index == Menu.GENRES:
             self.menu_stack.append(Display(display.menu_path + '/genres', 0))
         elif display.index == Menu.TRACKS:
+            self._draw_tracks()
             self.menu_stack.append(Display(display.menu_path + '/tracks', 0))
         elif display.index == Menu.QUEUE:
             self.menu_stack.append(Display(display.menu_path + '/queue', 0))
@@ -209,11 +232,13 @@ class View:
             song_info = metadata['title'] + cfg.song_sep_str + metadata['artist']
             self.screen.addstr(self.y_indicies['metadata'], 1, song_info)
             self._draw_progress_info(metadata)
-        
+
         menu = self.menu_stack[-1].menu_path
         if menu.endswith('home'):
             self._draw_home_menu()
         elif menu.endswith('playlists'):
             self._draw_playlists()
+        elif menu.endswith('tracks'):
+            self._draw_tracks()
         self.notify(str(self.menu_stack[-1]))
         self.screen.refresh()
