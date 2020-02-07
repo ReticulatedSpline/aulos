@@ -1,6 +1,6 @@
 import os
 
-# controls: [P]lay, P[a]use, [N]ext, [L]ast
+# music controls: [P]lay, P[a]use, [N]ext, [L]ast
 
 # directories
 music_dir = "music"
@@ -12,7 +12,16 @@ no_media_str = "Nothing playing."
 no_load_str = "..."
 song_sep_str = " by "
 time_sep_str = " of "
-home_menu_items = ["playlists", "albums", "artists", "genres", "tracks", "queue", "settings", "quit"]
+home_menu_items = [
+    "playlists",
+    "albums",
+    "artists",
+    "genres",
+    "tracks",
+    "queue",
+    "settings",
+    "quit"
+]
 
 # file types to scan for
 file_types = {'.mp3', '.flac'}
