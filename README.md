@@ -34,7 +34,7 @@ An open source digital audio player designed for the Raspberry Pi and based on t
 - [ ] Sync songs via WiFi and/or Bluetooth (with other openDAPs?)
 
 ## Recommended Hardware
-While running on this hardware is the long-term goal, note that openDAP should run on any terminal emulator.
+While running OpenDAP on the Raspberry Pi hardware is the long-term goal, note that openDAP *should* run on any terminal emulator.
 
 [Raspberry Pi 3 A+](https://www.adafruit.com/product/4027)
 
@@ -46,4 +46,4 @@ While running on this hardware is the long-term goal, note that openDAP should r
 `pip3 install -r requirements.txt`
 1. If on MacOS, you'll need to allow your terminal emulator permissions for the [pynput keyboard listener](https://pynput.readthedocs.io/en/latest/limitations.html#mac-osx). This is under System Preferences ▶ Security and Privacy ▶ Accessibility. You may also need to run the process as root; I've had better luck with 3rd party emulators than the native Terminal.app.
 1. Optionally add some files to `./music` `./playlists`.
-1. Run `python3 src/main.py`. Currently using arrow keys for navigation.
+1. Run `python3 src/main.py`.

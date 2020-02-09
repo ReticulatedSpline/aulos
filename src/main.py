@@ -43,7 +43,6 @@ def main():
     listener.start()
     while listener.running:
         tick(view, player)
-    del player
     del view
 
 

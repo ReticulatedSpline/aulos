@@ -1,49 +1,41 @@
 import os
-import vlc  # swiss army knife of media players
+import vlc
 import cfg
-from mutagen.easyid3 import EasyID3 as ID3  # audio file metadata
+from glob import glob
+from mutagen.easyid3 import EasyID3 as ID3
+
+playlists = glob(os.path.realpath(cfg.playlist_dir) + '/*.m3u')
+music = list()
+for ext in cfg.file_types:
+    file = os.path.join(cfg.music_dir, ext)
+    music.extend(glob(file))
 
 
 class Player:
     """Track player state, wrap calls to VLC, and handle scanning for media."""
 
     def __init__(self):
-        self.song_list = []
-        self.song_idx = 0
-        self.song_idx_max = 0
+        self.queue = list(music)
         self.vlc = vlc.Instance()
-        self._scan_library()
-        self.player = self.vlc.media_player_new(self.song_list[self.song_idx])
+        self.player = self.vlc.media_player_new(self.queue[0])
         self._update_song()
 
-    def __del__(self):
-        del self.vlc
-        return
-
-    def _scan_library(self):
-        for dirpath, _, files in os.walk(cfg.music_dir):
-            for file in files:
-                filepath = os.path.join(dirpath, file)
-                _, ext = os.path.splitext(filepath)
-                if ext in cfg.file_types:
-                    self.song_list.append(filepath)
-                    self.song_idx_max += 1
-
     def _get_id3(self, key: str):
-        metadata = ID3(self.song_list[self.song_idx])
+        metadata = ID3(self.queue[0])
         return str(metadata[key]).strip('[\']')
 
     def _update_song(self):
-        if self.song_list and self.song_idx < len(self.song_list):
-            self.media = self.vlc.media_new(self.song_list[self.song_idx])
+        if self.queue:
+            self.media = self.vlc.media_new(self.queue[0])
             self.media.get_mrl()
             self.player.set_media(self.media)
 
     def get_metadata(self):
         """Return a dictionary of title, artist, current/total runtimes."""
-        if (not self.song_list) or (self.song_idx < 0):
+        if not self.queue:
             return None
         else:
+
             # default states when not playing a track are negative integers
             curr_time = self.player.get_time() / 1000   # time returned in ms
             if curr_time < 0:
@@ -71,14 +63,8 @@ class Player:
 
     def skip_forward(self):
         """Skip the the beginning of the next track and start playing."""
-        if self.song_idx < self.song_idx_max:
-            self.song_idx += 1
-        self._update_song()
-        self.play()
+        # TODO
 
     def skip_back(self):
         """Skip to the beginning of the last track and start playing."""
-        if self.song_idx > 0:
-            self.song_idx -= 1
-        self._update_song()
-        self.play()
+        # TODO

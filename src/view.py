@@ -1,10 +1,11 @@
 """Functions and classes responsible for the user interface"""
-from typing import NamedTuple
 from enum import IntEnum
+from typing import NamedTuple
 from datetime import timedelta
-from glob import glob
-import curses
 import os
+import curses
+
+import player
 import cfg
 
 
@@ -31,8 +32,14 @@ class Direction(IntEnum):
 class Display(NamedTuple):
     """hold all information necessary to draw a display"""
     menu_path: str
-    index: int = 0
-    start_index: int = 0
+    items: list
+    index: int
+    start_index: int
+
+    def __str__(self):
+        str_rep = f'display "{self.menu_path}" has {len(self.items)} items. '
+        str_rep += f'starting at {self.start_index}, ({self.index} selected). '
+        return str_rep
 
 
 def _strfdelta(tdelta: timedelta):
@@ -56,13 +63,14 @@ class View:
         self.screen = curses.initscr()
         curses.curs_set(False)
 
-        # appended to when drilling down into menus, popped when navigating back
+        # appended to when digging into menus, popped when navigating back
         self.menu_stack = list()
-        self.menu_stack.append(Display('home', 0))
+        home = Display('home', cfg.home_menu_items, 0, 0)
+        self.menu_stack.append(home)
 
+        # persistant screen locations
         self.max_y_chars, self.max_x_chars = self.screen.getmaxyx()
-        # number of rows not taken up by borders or current song info
-        self.free_y_chars = self.max_y_chars - 6
+        self.num_menu_lines = self.max_y_chars - 7
         self.y_indicies = {
             'status': self.max_y_chars - 5,
             'metadata': self.max_y_chars - 4,
@@ -70,14 +78,10 @@ class View:
             'progress_bar': self.max_y_chars - 2
         }
 
-        self.notify("Ready")
-        self._draw_home_menu()
-        self._draw_borders()
         self.update_ui(None)
 
     def __del__(self):
         """Restore the previous state of the terminal"""
-        curses.curs_set(1)
         curses.endwin()
 
     def _clear_line(self, line: int):
@@ -86,7 +90,7 @@ class View:
         self._draw_borders()
 
     def _clear_menu_lines(self):
-        for line in list(range(1, self.free_y_chars)):
+        for line in list(range(1, self.num_menu_lines)):
             self._clear_line(line)
 
     def _clear_progress_lines(self):
@@ -98,7 +102,7 @@ class View:
         self.screen.border(0)
         menu_path = self.menu_stack[-1].menu_path
         if menu_path.endswith('home'):
-            title = ' ' + cfg.homescreen_title_str + ' '
+            title = ' ' + cfg.home_title_str + ' '
         else:
             title = ' ' + menu_path[5:] + ' '
         title_pos = (self.max_x_chars - len(title)) // 2
@@ -111,15 +115,6 @@ class View:
         self.screen.addch(middle_border, self.max_x_chars - 1, curses.ACS_RTEE)
         # draw middle border line
         self.screen.hline(middle_border, 1, curses.ACS_HLINE, self.max_x_chars - 2)
-
-    def _draw_home_menu(self):
-        """Draw the list of home menu options with the current selection highlighted"""
-        for idx, menu_item in enumerate(cfg.home_menu_items, start=1):
-            white_space = ' ' * (self.max_x_chars - len(menu_item) - 2)
-            if idx == self.menu_stack[-1].index + 1:
-                self.screen.addstr(idx, 1, menu_item + white_space, curses.A_REVERSE)
-            else:
-                self.screen.addstr(idx, 1, menu_item + white_space)
 
     def _draw_progress_info(self, metadata):
         if metadata is None:
@@ -135,7 +130,8 @@ class View:
         run_time_str = _strfdelta(timedelta(seconds=run_time))
         curr_time_str = _strfdelta(timedelta(seconds=curr_time))
         percent_str = ' (' + str(percent) + '%)'
-        time_str = curr_time_str + cfg.time_sep_str + run_time_str + percent_str
+        time_str = curr_time_str + cfg.time_sep_str + run_time_str
+        time_str += percent_str
 
         # two border characters
         progress_bar_chars = self.max_x_chars - 2
@@ -147,71 +143,68 @@ class View:
         self.screen.addstr(self.y_indicies['time'], 1, time_str)
         self.screen.addstr(self.y_indicies['progress_bar'], 1, progress_bar)
 
-    def _draw_playlists(self):
-        self._clear_menu_lines()
+    def _handle_home_select(self):
         display = self.menu_stack[-1]
-        playlist_dir = os.path.realpath(cfg.playlist_dir)
-        playlists = glob(playlist_dir + '/*.m3u')
-        for idx, playlist in enumerate(playlists, start=1):
-            if idx >= self.free_y_chars:
-                break
-            elif display.index + 1 == idx:
-                self.screen.addstr(idx, 1, os.path.basename(playlist), curses.A_REVERSE)
-            else:
-                self.screen.addstr(idx, 1, os.path.basename(playlist))
-
-    def _draw_tracks(self):
-        self._clear_menu_lines()
-        display = self.menu_stack[-1]
-        track_dir = os.path.realpath(cfg.music_dir)
-        tracks = glob(track_dir + '/*.mp3') + glob(track_dir + '/*.flac')
-        for idx, track in enumerate(tracks, start=1):
-            if idx >= self.free_y_chars:
-                break
-            elif display.index + 1 == idx:
-                self.screen.addstr(idx, 1, os.path.basename(track), curses.A_REVERSE)
-            else:
-                self.screen.addstr(idx, 1, os.path.basename(track))
-            
-
-    def _handle_home_select(self, display: Display):
         if display.index == Menu.EXIT:
+            # returning false to the Pynput thread kills it
             return False
         elif display.index == Menu.PLAYLISTS:
-            self._draw_playlists()
-            self.menu_stack.append(Display(display.menu_path + '/playlists', 0))
-        elif display.index == Menu.ALBUMS:
-            self.menu_stack.append(Display(display.menu_path + '/albums', 0))
-        elif display.index == Menu.ARTISTS:
-            self.menu_stack.append(Display(display.menu_path + '/artists', 0))
-        elif display.index == Menu.GENRES:
-            self.menu_stack.append(Display(display.menu_path + '/genres', 0))
+            path = display.menu_path + '/playlists'
+            display = Display(path, player.playlists, 0, 0)
+            self.menu_stack.append(display)
         elif display.index == Menu.TRACKS:
-            self._draw_tracks()
-            self.menu_stack.append(Display(display.menu_path + '/tracks', 0))
+            path = display.menu_path + '/tracks'
+            display = Display(path, player.music, 0, 0)
+            self.menu_stack.append(display)
+        elif display.index == Menu.ALBUMS:
+            self.notify("Not yet implemented!")
+        elif display.index == Menu.ARTISTS:
+            self.notify("Not yet implemented!")
+        elif display.index == Menu.GENRES:
+            self.notify("Not yet implemented!")
         elif display.index == Menu.QUEUE:
-            self.menu_stack.append(Display(display.menu_path + '/queue', 0))
+            self.notify("Not yet implemented!")
         elif display.index == Menu.SETTINGS:
-            self.menu_stack.append(Display(display.menu_path + '/settings', 0))
+            self.notify("Not yet implemented!")
         return True
 
+    def _draw_menu(self):
+        """draw the top menu on the menu stack"""
+        self._clear_menu_lines()
+        display = self.menu_stack[-1]
+        for idx, item in enumerate(display.items, start=1):
+            item_name = os.path.basename(item)
+            if idx > self.num_menu_lines:
+                break
+            elif display.index + 1 == idx:
+                self.screen.addstr(idx, 1, item_name, curses.A_REVERSE)
+            else:
+                self.screen.addstr(idx, 1, item_name)
+
     def navigate(self, direction: Direction):
-        """Handle menu navigation. Returns False if exiting program, else True."""
+        """returns false if quitting opendap, else true"""
         display = self.menu_stack[-1]
         if direction is Direction.UP:
             if display.index > 0:
-                self.menu_stack[-1] = display._replace(index=display.index-1)
+                self.menu_stack.pop()
+                display = display._replace(index=display.index - 1)
+                self.menu_stack.append(display)
         elif direction is Direction.DOWN:
-            if display.index + 1 < len(cfg.home_menu_items):
-                self.menu_stack[-1] = display._replace(index=display.index+1)
-        elif direction is Direction.SELECT:
-            if display.menu_path == 'home':
-                return self._handle_home_select(display)
+            if display.index < len(display.items) - 1:
+                display = self.menu_stack.pop()
+                display = display._replace(index=display.index + 1)
+                if display.index >= self.num_menu_lines:
+                    start_index = start_index + self.num_menu_lines
+                    display = display._replace(index=0, start_index=start_index)
+            self.menu_stack.append(display)
         elif direction is Direction.BACK:
             if len(self.menu_stack) > 1:
                 self.menu_stack.pop()
+        elif direction is Direction.SELECT:
+            if display.menu_path.endswith('home'):
+                return self._handle_home_select()
             else:
-                self.menu_stack[-1] = display._replace(menu_path='home', index=0)
+                self.notify('Not yet implemented :(')
         return True
 
     def notify(self, string: str):
@@ -233,12 +226,8 @@ class View:
             self.screen.addstr(self.y_indicies['metadata'], 1, song_info)
             self._draw_progress_info(metadata)
 
-        menu = self.menu_stack[-1].menu_path
-        if menu.endswith('home'):
-            self._draw_home_menu()
-        elif menu.endswith('playlists'):
-            self._draw_playlists()
-        elif menu.endswith('tracks'):
-            self._draw_tracks()
-        self.notify(str(self.menu_stack[-1]))
+        self._draw_menu()
+        self._draw_borders()
+        display = self.menu_stack[-1]
+        self.notify(str(display) + f'{self.num_menu_lines} menu lines available.')
         self.screen.refresh()

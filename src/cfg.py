@@ -1,13 +1,12 @@
-import os
+"""User settings. Change only text between quotes."""
 
-# music controls: [P]lay, P[a]use, [N]ext, [L]ast
-
-# directories
-music_dir = "music"
+# file system
+file_types = ('*.mp3', '*.flac')
 playlist_dir = "playlists"
+music_dir = "music"
 
 # text strings
-homescreen_title_str = u'☭'
+home_title_str = u"\u262D"
 no_media_str = "Nothing playing."
 no_load_str = "..."
 song_sep_str = " by "
@@ -22,9 +21,4 @@ home_menu_items = [
     "settings",
     "quit"
 ]
-
-# file types to scan for
-file_types = {'.mp3', '.flac'}
-
-# progress bar filler
 prog_fill = '▒'
