@@ -90,7 +90,7 @@ class View:
         self._draw_borders()
 
     def _clear_menu_lines(self):
-        for line in list(range(1, self.num_menu_lines)):
+        for line in list(range(1, self.num_menu_lines + 1)):
             self._clear_line(line)
 
     def _clear_progress_lines(self):
@@ -145,26 +145,27 @@ class View:
 
     def _handle_home_select(self):
         display = self.menu_stack[-1]
-        if display.index == Menu.EXIT:
+        index = display.index + display.start_index
+        if index == Menu.EXIT:
             # returning false to the Pynput thread kills it
             return False
-        elif display.index == Menu.PLAYLISTS:
+        elif index == Menu.PLAYLISTS:
             path = display.menu_path + '/playlists'
             display = Display(path, player.playlists, 0, 0)
             self.menu_stack.append(display)
-        elif display.index == Menu.TRACKS:
+        elif index == Menu.TRACKS:
             path = display.menu_path + '/tracks'
             display = Display(path, player.music, 0, 0)
             self.menu_stack.append(display)
-        elif display.index == Menu.ALBUMS:
+        elif index == Menu.ALBUMS:
             self.notify("Not yet implemented!")
-        elif display.index == Menu.ARTISTS:
+        elif index == Menu.ARTISTS:
             self.notify("Not yet implemented!")
-        elif display.index == Menu.GENRES:
+        elif index == Menu.GENRES:
             self.notify("Not yet implemented!")
-        elif display.index == Menu.QUEUE:
+        elif index == Menu.QUEUE:
             self.notify("Not yet implemented!")
-        elif display.index == Menu.SETTINGS:
+        elif index == Menu.SETTINGS:
             self.notify("Not yet implemented!")
         return True
 
@@ -172,7 +173,7 @@ class View:
         """draw the top menu on the menu stack"""
         self._clear_menu_lines()
         display = self.menu_stack[-1]
-        for idx, item in enumerate(display.items, start=1):
+        for idx, item in enumerate(display.items[display.start_index:], start=1):
             item_name = os.path.basename(item)
             if idx > self.num_menu_lines:
                 break
@@ -182,19 +183,26 @@ class View:
                 self.screen.addstr(idx, 1, item_name)
 
     def navigate(self, direction: Direction):
-        """returns false if quitting opendap, else true"""
+        """handle menu scrolling by manipulating display tuples. returns false if quitting"""
         display = self.menu_stack[-1]
         if direction is Direction.UP:
-            if display.index > 0:
+            if display.start_index + display.index > 0:
                 self.menu_stack.pop()
-                display = display._replace(index=display.index - 1)
+                index = display.index
+                start_index = display.start_index
+                if display.index > 0:
+                    index = display.index - 1
+                elif display.start_index >= self.num_menu_lines:
+                    start_index = start_index - self.num_menu_lines
+                    index = self.num_menu_lines - 1
+                display = display._replace(index=index, start_index=start_index)
                 self.menu_stack.append(display)
         elif direction is Direction.DOWN:
-            if display.index < len(display.items) - 1:
+            if display.start_index + display.index < len(display.items) - 1:
                 display = self.menu_stack.pop()
                 display = display._replace(index=display.index + 1)
                 if display.index >= self.num_menu_lines:
-                    start_index = start_index + self.num_menu_lines
+                    start_index = display.start_index + self.num_menu_lines
                     display = display._replace(index=0, start_index=start_index)
             self.menu_stack.append(display)
         elif direction is Direction.BACK:
