@@ -5,7 +5,7 @@ from datetime import timedelta
 import os
 import curses
 
-import player
+import model
 import cfg
 
 
@@ -83,6 +83,8 @@ class View:
     def __del__(self):
         """Restore the previous state of the terminal"""
         curses.endwin()
+        # endwin *should* restore state, but seems unreliable
+        os.system('cls||clear')
 
     def _clear_line(self, line: int):
         self.screen.move(line, 1)
