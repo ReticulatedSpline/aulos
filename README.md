@@ -9,7 +9,7 @@ An open source digital audio player designed for the Raspberry Pi and based on t
 
 - [x] Menu navigation
 
-- [ ] .m3u playlist support
+- [x] .m3u playlist support
 
 - [ ] Browse library by artist, album, genre, and year
 
