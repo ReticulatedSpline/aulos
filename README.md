@@ -1,5 +1,5 @@
 # OpenDAP
-An open source digital audio player designed for the Raspberry Pi and based on the venerable [VLC media player](https://en.wikipedia.org/wiki/VLC_media_player). Local storage means your music is accessable even when you're without internet, which should be ideal for users who find themselves on the moon, or stuck in the '70s. OpenDAP is not tested on animals.
+An open source digital audio player designed for the Raspberry Pi and based on the venerable [VLC media player](https://en.wikipedia.org/wiki/VLC_media_player). Local storage means your music is accessable even when you're without internet, which should be ideal for users who find themselves stuck in the 1970s. OpenDAP is not tested on animals.
 
 ## Roadmap
 
