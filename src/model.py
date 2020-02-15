@@ -2,7 +2,13 @@ import os
 import vlc
 import cfg
 from glob import glob
+from typing import NamedTuple
 from mutagen.easyid3 import EasyID3 as ID3
+
+
+class MediaItem(NamedTuple):
+    index: int
+    path: str
 
 
 class Library:

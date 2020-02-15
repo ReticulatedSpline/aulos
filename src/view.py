@@ -1,16 +1,28 @@
 """Functions and classes responsible for the user interface"""
 from enum import IntEnum
 from typing import NamedTuple
+from os import path, system
 from datetime import timedelta
-import os
+from pynput import StopException
 import curses
-
-import model
 import cfg
 
 
+class ActionType(IntEnum):
+    """actions the view can invoke"""
+    PLAY_NOW = 0
+    QUEUE_FRONT = 1
+    QUEUE_BACK = 2
+
+
+class Action(NamedTuple):
+    """passed from view back to controller"""
+    action: ActionType
+    media_id: int
+
+
 class Menu(IntEnum):
-    """Possible home menu options"""
+    """home menu options"""
     PLAYLISTS = 0
     ALBUMS = 1
     ARTISTS = 2
@@ -22,7 +34,7 @@ class Menu(IntEnum):
 
 
 class Direction(IntEnum):
-    """Possible navigational directions"""
+    """navigational directions"""
     UP = 1
     DOWN = 2
     SELECT = 3
@@ -42,22 +54,8 @@ class Display(NamedTuple):
         return str_rep
 
 
-def _strfdelta(tdelta: timedelta):
-    """Format a timedelta into a string"""
-    days = tdelta.days
-    hours, rem = divmod(tdelta.seconds, 3600)
-    minutes, seconds = divmod(rem, 60)
-
-    time_str = f'{minutes}:{seconds:0>2}'
-    if days > 0:
-        time_str += str(days) + ' days, '
-    if hours > 0:
-        time_str += str(hours) + ' hours '
-    return time_str
-
-
 class View:
-    """Wrap the python Curses library and handle all aspects of the TUI."""
+    """wrap the curses library and handle the TUI."""
 
     def __init__(self):
         self.screen = curses.initscr()
@@ -81,10 +79,24 @@ class View:
         self.update_ui(None)
 
     def __del__(self):
-        """Restore the previous state of the terminal"""
+        """restore the previous state of the terminal"""
         curses.endwin()
         # endwin *should* restore state, but seems unreliable
-        os.system('cls||clear')
+        system('cls||clear')
+
+    @staticmethod
+    def _strfdelta(tdelta: timedelta):
+        """Format a timedelta into a string"""
+        days = tdelta.days
+        hours, rem = divmod(tdelta.seconds, 3600)
+        minutes, seconds = divmod(rem, 60)
+
+        time_str = f'{minutes}:{seconds:0>2}'
+        if days > 0:
+            time_str += str(days) + ' days, '
+        if hours > 0:
+            time_str += str(hours) + ' hours '
+        return time_str
 
     def _clear_line(self, line: int):
         self.screen.move(line, 1)
@@ -129,8 +141,8 @@ class View:
             return
 
         percent = int((curr_time / run_time) * 100)
-        run_time_str = _strfdelta(timedelta(seconds=run_time))
-        curr_time_str = _strfdelta(timedelta(seconds=curr_time))
+        run_time_str = self._strfdelta(timedelta(seconds=run_time))
+        curr_time_str = self._strfdelta(timedelta(seconds=curr_time))
         percent_str = ' (' + str(percent) + '%)'
         time_str = curr_time_str + cfg.time_sep_str + run_time_str
         time_str += percent_str
@@ -149,8 +161,7 @@ class View:
         display = self.menu_stack[-1]
         index = display.index + display.start_index
         if index == Menu.EXIT:
-            # returning false to the Pynput thread kills it
-            return False
+            raise StopException
         elif index == Menu.PLAYLISTS:
             path = display.menu_path + '/playlists'
             display = Display(path, player.playlists, 0, 0)
@@ -169,14 +180,13 @@ class View:
             self.notify("Not yet implemented!")
         elif index == Menu.SETTINGS:
             self.notify("Not yet implemented!")
-        return True
 
     def _draw_menu(self):
         """draw the top menu on the menu stack"""
         self._clear_menu_lines()
         display = self.menu_stack[-1]
         for idx, item in enumerate(display.items[display.start_index:], start=1):
-            item_name = os.path.basename(item)
+            item_name = path.basename(item)
             if idx > self.num_menu_lines:
                 break
             elif display.index + 1 == idx:
@@ -184,29 +194,35 @@ class View:
             else:
                 self.screen.addstr(idx, 1, item_name)
 
+    def _navigate_up(self, display: Display):
+        if display.start_index + display.index > 0:
+            self.menu_stack.pop()
+            index = display.index
+            start_index = display.start_index
+            if display.index > 0:
+                index = display.index - 1
+            elif display.start_index >= self.num_menu_lines:
+                start_index = start_index - self.num_menu_lines
+                index = self.num_menu_lines - 1
+            display = display._replace(index=index, start_index=start_index)
+            self.menu_stack.append(display)
+
+    def _navigate_down(self, display: Display):
+        if display.start_index + display.index < len(display.items) - 1:
+            display = self.menu_stack.pop()
+            display = display._replace(index=display.index + 1)
+            if display.index >= self.num_menu_lines:
+                start_index = display.start_index + self.num_menu_lines
+                display = display._replace(index=0, start_index=start_index)
+        self.menu_stack.append(display)
+
     def navigate(self, direction: Direction):
-        """handle menu scrolling by manipulating display tuples. returns false if quitting"""
+        """handle menu scrolling by manipulating display tuples"""
         display = self.menu_stack[-1]
         if direction is Direction.UP:
-            if display.start_index + display.index > 0:
-                self.menu_stack.pop()
-                index = display.index
-                start_index = display.start_index
-                if display.index > 0:
-                    index = display.index - 1
-                elif display.start_index >= self.num_menu_lines:
-                    start_index = start_index - self.num_menu_lines
-                    index = self.num_menu_lines - 1
-                display = display._replace(index=index, start_index=start_index)
-                self.menu_stack.append(display)
+            self._navigate_up(display)
         elif direction is Direction.DOWN:
-            if display.start_index + display.index < len(display.items) - 1:
-                display = self.menu_stack.pop()
-                display = display._replace(index=display.index + 1)
-                if display.index >= self.num_menu_lines:
-                    start_index = display.start_index + self.num_menu_lines
-                    display = display._replace(index=0, start_index=start_index)
-            self.menu_stack.append(display)
+            self._navigate_down(display)
         elif direction is Direction.BACK:
             if len(self.menu_stack) > 1:
                 self.menu_stack.pop()
@@ -215,7 +231,6 @@ class View:
                 return self._handle_home_select()
             else:
                 self.notify('Not yet implemented :(')
-        return True
 
     def notify(self, string: str):
         """Add a string to the window. Persistant until overwritten"""
@@ -239,5 +254,5 @@ class View:
         self._draw_menu()
         self._draw_borders()
         display = self.menu_stack[-1]
-        self.notify(str(display) + f'{self.num_menu_lines} menu lines available.')
+        self.notify(str(display) + f'{self.num_menu_lines} menu lines')
         self.screen.refresh()
