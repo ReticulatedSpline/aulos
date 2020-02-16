@@ -1,15 +1,19 @@
 """gobetween for view & model"""
-
-import os
-from time import sleep
 from functools import partial
 from pynput.keyboard import Listener, KeyCode, Key
 
-from view import View, Direction
-from model import Player, Library
+from view import View, Action, Direction
+from model import Library, Player
 
 
-def on_press(key: KeyCode, view: View, player: Player):
+def handle_action(action: Action, player: Player):
+    if not action:
+        return
+    if action.action is ActionType.PLAY:
+        player.play(action.index)
+
+
+def on_press(key: KeyCode, view: View, player: Player, library: Library):
     """Callback for handling user input."""
     if hasattr(key, 'char'):
         if key.char == 'p':
@@ -20,16 +24,18 @@ def on_press(key: KeyCode, view: View, player: Player):
             player.skip_forward()
         elif key.char == 'l':
             player.skip_back()
+        return True
     else:
+        action = None
         if key == Key.up:
-            view.navigate(Direction.UP)
+            action = view.navigate(Direction.UP)
         elif key == Key.down:
-            view.navigate(Direction.DOWN)
+            action = view.navigate(Direction.DOWN)
         elif key == Key.right:
-            return view.navigate(Direction.SELECT)
+            action = view.navigate(Direction.SELECT)
         elif key == Key.left:
-            view.navigate(Direction.BACK)
-    return True
+            action = view.navigate(Direction.BACK)
+        handle_action(action, player)
 
 
 def tick(view: View, player: Player):
@@ -43,7 +49,8 @@ def start():
     view = View()
     library = Library()
     player = Player(library)
-    listener = Listener(on_press=partial(on_press, view=view, player=player))
+    listener = Listener(on_press=partial(
+        on_press, view=view, player=player, library=library))
     listener.start()
     while listener.running:
         tick(view, player)

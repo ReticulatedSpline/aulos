@@ -1,18 +1,18 @@
-"""Functions and classes responsible for the user interface"""
+"""classes responsible for the user interface"""
 from enum import IntEnum
 from typing import NamedTuple
-from os import path, system
+from os import path
 from datetime import timedelta
-from pynput import StopException
 import curses
 import cfg
 
 
 class ActionType(IntEnum):
     """actions the view can invoke"""
-    PLAY_NOW = 0
-    QUEUE_FRONT = 1
-    QUEUE_BACK = 2
+    EXIT = 0
+    PLAY = 1
+    QUEUE_FRONT = 2
+    QUEUE_BACK = 3
 
 
 class Action(NamedTuple):
@@ -81,8 +81,6 @@ class View:
     def __del__(self):
         """restore the previous state of the terminal"""
         curses.endwin()
-        # endwin *should* restore state, but seems unreliable
-        system('cls||clear')
 
     @staticmethod
     def _strfdelta(tdelta: timedelta):
@@ -161,7 +159,7 @@ class View:
         display = self.menu_stack[-1]
         index = display.index + display.start_index
         if index == Menu.EXIT:
-            raise StopException
+            return Action(ActionType.EXIT, None)
         elif index == Menu.PLAYLISTS:
             path = display.menu_path + '/playlists'
             display = Display(path, player.playlists, 0, 0)
@@ -185,14 +183,15 @@ class View:
         """draw the top menu on the menu stack"""
         self._clear_menu_lines()
         display = self.menu_stack[-1]
-        for idx, item in enumerate(display.items[display.start_index:], start=1):
+        display_items = display.items[display.start_index:]
+        for list_index, item in enumerate(display_items, start=1):
             item_name = path.basename(item)
-            if idx > self.num_menu_lines:
+            if list_index > self.num_menu_lines:
                 break
-            elif display.index + 1 == idx:
-                self.screen.addstr(idx, 1, item_name, curses.A_REVERSE)
+            elif display.index + 1 == list_index:
+                self.screen.addstr(list_index, 1, item_name, curses.A_REVERSE)
             else:
-                self.screen.addstr(idx, 1, item_name)
+                self.screen.addstr(list_index, 1, item_name)
 
     def _navigate_up(self, display: Display):
         if display.start_index + display.index > 0:
