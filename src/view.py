@@ -1,30 +1,8 @@
 """classes responsible for the user interface"""
-from enum import IntEnum
 from typing import NamedTuple
-from os import path
 from datetime import timedelta
 import curses
 import cfg
-
-
-class Menu(IntEnum):
-    """home menu options"""
-    PLAYLISTS = 0
-    ALBUMS = 1
-    ARTISTS = 2
-    GENRES = 3
-    TRACKS = 4
-    QUEUE = 5
-    SETTINGS = 6
-    EXIT = 7
-
-
-class Direction(IntEnum):
-    """navigational directions"""
-    UP = 1
-    DOWN = 2
-    SELECT = 3
-    BACK = 4
 
 
 class Display(NamedTuple):
@@ -147,7 +125,8 @@ class View:
         display = self.menu_stack[-1]
         display_items = display.items[display.start_index:]
         for list_index, item in enumerate(display_items, start=1):
-            item_name = path.basename(item)
+            item = item.replace('\\', "/")
+            item_name = item.split('/')[-1]
             if list_index > self.num_menu_lines:
                 break
             elif display.index + 1 == list_index:

@@ -1,9 +1,30 @@
 """gobetween for view & model"""
+from enum import IntEnum
 from functools import partial
 from pynput.keyboard import Listener, KeyCode, Key
 
-from view import View, Direction, Display, Menu
+from view import View, Display
 from model import Library, Player
+
+
+class Menu(IntEnum):
+    """home menu options"""
+    PLAYLISTS = 0
+    ALBUMS = 1
+    ARTISTS = 2
+    GENRES = 3
+    TRACKS = 4
+    QUEUE = 5
+    SETTINGS = 6
+    EXIT = 7
+
+
+class Direction(IntEnum):
+    """navigational directions"""
+    UP = 1
+    DOWN = 2
+    SELECT = 3
+    BACK = 4
 
 
 def handle_home_select(view: View, library: Library):
