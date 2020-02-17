@@ -2,15 +2,51 @@
 from functools import partial
 from pynput.keyboard import Listener, KeyCode, Key
 
-from view import View, Action, Direction
+from view import View, Direction, Display, Menu
 from model import Library, Player
 
 
-def handle_action(action: Action, player: Player):
-    if not action:
-        return
-    if action.action is ActionType.PLAY:
-        player.play(action.index)
+def handle_home_select(view: View, library: Library):
+    display = view.menu_stack[-1]
+    index = display.index + display.start_index
+    if index == Menu.EXIT:
+        return False
+    elif index == Menu.PLAYLISTS:
+        path = display.menu_path + '/playlists'
+        display = Display(path, library.playlists, 0, 0)
+        view.menu_stack.append(display)
+    elif index == Menu.TRACKS:
+        path = display.menu_path + '/tracks'
+        display = Display(path, library.music, 0, 0)
+        view.menu_stack.append(display)
+    elif index == Menu.ALBUMS:
+        view.notify("Not yet implemented!")
+    elif index == Menu.ARTISTS:
+        view.notify("Not yet implemented!")
+    elif index == Menu.GENRES:
+        view.notify("Not yet implemented!")
+    elif index == Menu.QUEUE:
+        view.notify("Not yet implemented!")
+    elif index == Menu.SETTINGS:
+        view.notify("Not yet implemented!")
+    return True
+
+
+def navigate(view: View, library: Library, direction: Direction):
+    """handle menu scrolling by manipulating display tuples"""
+    display = view.menu_stack[-1]
+    if direction is Direction.UP:
+        view.navigate_up(display)
+    elif direction is Direction.DOWN:
+        view.navigate_down(display)
+    elif direction is Direction.BACK:
+        if len(view.menu_stack) > 1:
+            view.menu_stack.pop()
+    elif direction is Direction.SELECT:
+        if display.menu_path.endswith('home'):
+            return handle_home_select(view, library)
+        else:
+            view.notify('Not yet implemented')
 
 
 def on_press(key: KeyCode, view: View, player: Player, library: Library):
@@ -28,14 +64,13 @@ def on_press(key: KeyCode, view: View, player: Player, library: Library):
     else:
         action = None
         if key == Key.up:
-            action = view.navigate(Direction.UP)
+            return navigate(view, library, Direction.UP)
         elif key == Key.down:
-            action = view.navigate(Direction.DOWN)
+            return navigate(view, library, Direction.DOWN)
         elif key == Key.right:
-            action = view.navigate(Direction.SELECT)
+            return navigate(view, library, Direction.SELECT)
         elif key == Key.left:
-            action = view.navigate(Direction.BACK)
-        handle_action(action, player)
+            return navigate(view, library, Direction.BACK)
 
 
 def tick(view: View, player: Player):

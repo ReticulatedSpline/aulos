@@ -7,20 +7,6 @@ import curses
 import cfg
 
 
-class ActionType(IntEnum):
-    """actions the view can invoke"""
-    EXIT = 0
-    PLAY = 1
-    QUEUE_FRONT = 2
-    QUEUE_BACK = 3
-
-
-class Action(NamedTuple):
-    """passed from view back to controller"""
-    action: ActionType
-    media_id: int
-
-
 class Menu(IntEnum):
     """home menu options"""
     PLAYLISTS = 0
@@ -155,30 +141,6 @@ class View:
         self.screen.addstr(self.y_indicies['time'], 1, time_str)
         self.screen.addstr(self.y_indicies['progress_bar'], 1, progress_bar)
 
-    def _handle_home_select(self):
-        display = self.menu_stack[-1]
-        index = display.index + display.start_index
-        if index == Menu.EXIT:
-            return Action(ActionType.EXIT, None)
-        elif index == Menu.PLAYLISTS:
-            path = display.menu_path + '/playlists'
-            display = Display(path, player.playlists, 0, 0)
-            self.menu_stack.append(display)
-        elif index == Menu.TRACKS:
-            path = display.menu_path + '/tracks'
-            display = Display(path, player.music, 0, 0)
-            self.menu_stack.append(display)
-        elif index == Menu.ALBUMS:
-            self.notify("Not yet implemented!")
-        elif index == Menu.ARTISTS:
-            self.notify("Not yet implemented!")
-        elif index == Menu.GENRES:
-            self.notify("Not yet implemented!")
-        elif index == Menu.QUEUE:
-            self.notify("Not yet implemented!")
-        elif index == Menu.SETTINGS:
-            self.notify("Not yet implemented!")
-
     def _draw_menu(self):
         """draw the top menu on the menu stack"""
         self._clear_menu_lines()
@@ -193,7 +155,7 @@ class View:
             else:
                 self.screen.addstr(list_index, 1, item_name)
 
-    def _navigate_up(self, display: Display):
+    def navigate_up(self, display: Display):
         if display.start_index + display.index > 0:
             self.menu_stack.pop()
             index = display.index
@@ -206,7 +168,7 @@ class View:
             display = display._replace(index=index, start_index=start_index)
             self.menu_stack.append(display)
 
-    def _navigate_down(self, display: Display):
+    def navigate_down(self, display: Display):
         if display.start_index + display.index < len(display.items) - 1:
             display = self.menu_stack.pop()
             display = display._replace(index=display.index + 1)
@@ -214,22 +176,6 @@ class View:
                 start_index = display.start_index + self.num_menu_lines
                 display = display._replace(index=0, start_index=start_index)
         self.menu_stack.append(display)
-
-    def navigate(self, direction: Direction):
-        """handle menu scrolling by manipulating display tuples"""
-        display = self.menu_stack[-1]
-        if direction is Direction.UP:
-            self._navigate_up(display)
-        elif direction is Direction.DOWN:
-            self._navigate_down(display)
-        elif direction is Direction.BACK:
-            if len(self.menu_stack) > 1:
-                self.menu_stack.pop()
-        elif direction is Direction.SELECT:
-            if display.menu_path.endswith('home'):
-                return self._handle_home_select()
-            else:
-                self.notify('Not yet implemented :(')
 
     def notify(self, string: str):
         """Add a string to the window. Persistant until overwritten"""
