@@ -27,17 +27,23 @@ class Direction(IntEnum):
     BACK = 4
 
 
+def handle_playlist_select(view: View, library: Library):
+    display = view.menu_stack[-1]
+    playlist = library.playlists[display.index + display.start_index]
+    if (playlist.is_dir):
+        # TODO: Handle this case
+        pass
+    else:
+        new_dp_path = display.menu_path + '/' + playlist.name
+        items = [str(item) for item in playlist.items]
+        new_display = Display(new_dp_path, items, 0, 0)
+        view.menu_stack.append(new_display)
+
+
 def handle_select(view: View, library: Library):
     display = view.menu_stack[-1]
     if display.menu_path.startswith('home/playlists'):
-        item = library.playlists[display.index + display.start_index]
-        if (item.is_dir):
-            # TODO: Handle this case
-            pass
-        else:
-            selction_name = item.name
-            new_dp_path = display.menu_path + '/' + selection_name
-            new_display = Display(new_dp_path, item.items, 0, 0)
+        handle_playlist_select(view, library)
 
 
 def handle_home_select(view: View, library: Library):
@@ -47,7 +53,8 @@ def handle_home_select(view: View, library: Library):
         return False
     elif index == Menu.PLAYLISTS:
         path = display.menu_path + '/playlists'
-        display = Display(path, library.playlists, 0, 0)
+        items = [item.name for item in library.playlists]
+        display = Display(path, items, 0, 0)
         view.menu_stack.append(display)
     elif index == Menu.TRACKS:
         path = display.menu_path + '/tracks'

@@ -21,21 +21,25 @@ class Library:
     """handle scanning and storing media"""
     def __init__(self):
         self.music = list()
-        self.playlists = self.scan_playlists()
-        for ext in cfg.file_types:
-            file = os.path.join(cfg.music_dir, ext)
+        self.scan_playlists()
+        for ext in cfg.music_formats:
+            file = os.path.join(cfg.music_dir, '*' + ext)
             self.music.extend(glob(file))
 
     def scan_playlists(self):
         self.playlists = list()
         for root, dirs, files in os.walk(cfg.playlist_dir):
-            for file in files:
+            for filename in files:
+                extention = os.path.splitext(filename)[1]
+                if (not extention) or (extention not in cfg.playlist_formats):
+                    continue
+
                 tracks = list()
-                path = os.path.join(root, file)
+                path = os.path.join(root, filename)
                 with open(path, 'r') as playlist:
                     for line in playlist:
-                        tracks.append(line)
-                item = PlaylistItem(file, False, tracks)
+                        tracks.append(line.rstrip())
+                item = PlaylistItem(filename, False, tracks)
                 self.playlists.append(item)
 
 

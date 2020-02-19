@@ -123,6 +123,10 @@ class View:
         """draw the top menu on the menu stack"""
         self._clear_menu_lines()
         display = self.menu_stack[-1]
+        
+        if not display.items:
+            return
+
         display_items = display.items[display.start_index:]
         for list_index, item in enumerate(display_items, start=1):
             item = item.replace('\\', "/")
@@ -178,5 +182,4 @@ class View:
         self._draw_menu()
         self._draw_borders()
         display = self.menu_stack[-1]
-        self.notify(str(display) + f'{self.num_menu_lines} menu lines')
         self.screen.refresh()
