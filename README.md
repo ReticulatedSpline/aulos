@@ -1,5 +1,5 @@
 # OpenDAP
-An open source digital audio player designed for the Raspberry Pi and based on the venerable [VLC media player](https://en.wikipedia.org/wiki/VLC_media_player). Local storage means your music is accessable even when you're without internet, which should be ideal for users stuck in the 1970s. OpenDAP is structured following the Model-View-Controller architecture, and is not tested on animals.
+A digital audio player designed for local media files. OpenDAP is intended for the Raspberry Pi and based on the venerable [VLC media player](https://en.wikipedia.org/wiki/VLC_media_player). OpenDAP is not tested on animals.
 
 ## Roadmap
 
@@ -40,7 +40,17 @@ While running OpenDAP on the Raspberry Pi hardware is the long-term goal, note t
 
 [2.8 inch PiTFT touchscreen display](https://www.adafruit.com/product/1601)
 
-## Development Setup
+## Development
+### Architecture
+OpenDAP is loosely based on the Model-View-Controller architecture. In general...
+
+**View.py**: Anything using curses or drawing on the display.
+
+**Controller.py**: Logic determining which screen is drawn next and gathering input.
+
+**Model.py**: Code handling the disk or VLC.
+
+### Setup
 1. Install [VLC](https://www.videolan.org/vlc/) if you don't have it already.
 1. Install [Python 3+](https://www.python.org/), and then install dependencies:
 `pip3 install -r requirements.txt`
