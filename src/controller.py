@@ -27,6 +27,19 @@ class Direction(IntEnum):
     BACK = 4
 
 
+def handle_select(view: View, library: Library):
+    display = view.menu_stack[-1]
+    if display.menu_path.startswith('home/playlists'):
+        item = library.playlists[display.index + display.start_index]
+        if (item.is_dir):
+            # TODO: Handle this case
+            pass
+        else:
+            selction_name = item.name
+            new_dp_path = display.menu_path + '/' + selection_name
+            new_display = Display(new_dp_path, item.items, 0, 0)
+
+
 def handle_home_select(view: View, library: Library):
     display = view.menu_stack[-1]
     index = display.index + display.start_index
@@ -67,7 +80,7 @@ def navigate(view: View, library: Library, direction: Direction):
         if display.menu_path.endswith('home'):
             return handle_home_select(view, library)
         else:
-            view.notify('Not yet implemented')
+            return handle_select(view, library)
 
 
 def on_press(key: KeyCode, view: View, player: Player, library: Library):

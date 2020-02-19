@@ -11,26 +11,41 @@ class MediaItem(NamedTuple):
     path: str
 
 
+class PlaylistItem(NamedTuple):
+    name: str
+    is_dir: bool
+    items: list
+
+
 class Library:
-    """Handle scanning for media and manage the database"""
+    """handle scanning and storing media"""
     def __init__(self):
-        self.playlists = glob(os.path.realpath(cfg.playlist_dir) + '/*.m3u')
         self.music = list()
+        self.playlists = self.scan_playlists()
         for ext in cfg.file_types:
             file = os.path.join(cfg.music_dir, ext)
             self.music.extend(glob(file))
 
-    def get_all_tracks(self):
-        return self.music
+    def scan_playlists(self):
+        self.playlists = list()
+        for root, dirs, files in os.walk(cfg.playlist_dir):
+            for file in files:
+                tracks = list()
+                path = os.path.join(root, file)
+                with open(path, 'r') as playlist:
+                    for line in playlist:
+                        tracks.append(line)
+                item = PlaylistItem(file, False, tracks)
+                self.playlists.append(item)
 
 
 class Player:
-    """Track player state, wrap calls to VLC, and handle scanning for media."""
+    """track player state and wrap calls to VLC"""
 
     def __init__(self, library: Library):
-        self.queue = library.get_all_tracks()
+        self.queue = list()
         self.vlc = vlc.Instance()
-        self.player = self.vlc.media_player_new(self.queue[0])
+        self.player = self.vlc.media_player_new(library.music[0])
         self._update_song()
 
     def _get_id3(self, key: str):
@@ -48,7 +63,6 @@ class Player:
         if not self.queue:
             return None
         else:
-
             # default states when not playing a track are negative integers
             curr_time = self.player.get_time() / 1000   # time returned in ms
             if curr_time < 0:
@@ -67,17 +81,17 @@ class Player:
             return info
 
     def play(self):
-        """Start playing the current track."""
+        """start playing the current track."""
         self.player.play()
 
     def pause(self):
-        """Pause the current track. Position is preserved."""
+        """pause the current track. position is preserved."""
         self.player.pause()
 
     def skip_forward(self):
-        """Skip the the beginning of the next track and start playing."""
+        """skip the the beginning of the next track and start playing."""
         # TODO
 
     def skip_back(self):
-        """Skip to the beginning of the last track and start playing."""
+        """skip to the beginning of the last track and start playing."""
         # TODO
