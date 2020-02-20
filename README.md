@@ -44,16 +44,16 @@ While running OpenDAP on the Raspberry Pi hardware is the long-term goal, note t
 ### Architecture
 OpenDAP is loosely based on the Model-View-Controller architecture. You'll find code split into one of three files:
 
-**View.py**: Code that touches the Curses library or draws on the display.
+**View.py**: Code that uses the Curses library or draws on the display.
 
 **Controller.py**: Logic determining which screen is drawn next and gathering user input.
 
-**Model.py**: Code handling disk I/O or touches the VLC library.
+**Model.py**: Code that handles disk I/O or uses the VLC library.
 
 ### Setup
 1. Install [VLC](https://www.videolan.org/vlc/) if you don't have it already.
-1. Install [Python 3+](https://www.python.org/), and then install dependencies:
+1. Install [Python 3+](https://www.python.org/) if you don't have it already, and then install pip dependencies:
 `pip3 install -r requirements.txt`
-1. If on MacOS, you'll need to allow your terminal emulator permissions for the [pynput keyboard listener](https://pynput.readthedocs.io/en/latest/limitations.html#mac-osx). This is under System Preferences ▶ Security and Privacy ▶ Accessibility. You may also need to run the process as root; I've had better luck with 3rd party emulators than the native Terminal.app.
+1. If you're on MacOS, you'll need to grant your terminal emulator [permissions](https://support.apple.com/guide/mac-help/allow-accessibility-apps-to-access-your-mac-mh43185/mac) for the [pynput keyboard listener](https://pynput.readthedocs.io/en/latest/limitations.html#mac-osx) to work. This setting can be found under System Preferences ▶ Security and Privacy ▶ Accessibility. You may also need to run the process as root; I've had better luck with 3rd party emulators than the native Terminal.app.
 1. Optionally add some files to `./music` `./playlists`.
 1. Run `python3 src/main.py`.
