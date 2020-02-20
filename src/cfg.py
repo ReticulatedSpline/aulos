@@ -23,10 +23,10 @@ home_menu_items = [
     "quit"
 ]
 song_menu_items = [
-    "play now"
-    "play next"
-    "play last"
-    "edit tags"
+    "play now",
+    "play next",
+    "play last",
+    "edit tags",
     "delete track"
 ]
 prog_fill = '▒'
