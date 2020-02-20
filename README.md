@@ -7,13 +7,15 @@ A digital audio player designed for local media files, intended for the Raspberr
 
 - [x] UI with current song and playback progress
 
-- [x] Menu navigation
+- [x] Curses menu navigation
 
-- [x] .m3u playlist support
+- [x] Browse library by track
 
-- [ ] Browse library by artist, album, genre, and year
+- [x] Browse library by playlist
 
 - [ ] Queue functionality
+
+- [ ] Browse library by artist, album, genre, and year
 
 - [ ] Compatibility with the AdaFruit PiTFT touch display and/or hardware buttons
 
