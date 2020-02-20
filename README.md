@@ -1,5 +1,5 @@
 # OpenDAP
-A digital audio player designed for local media files. OpenDAP is intended for the Raspberry Pi and based on the venerable [VLC media player](https://en.wikipedia.org/wiki/VLC_media_player). OpenDAP is not tested on animals.
+A digital audio player designed for local media files, intended for the Raspberry Pi, and based on the venerable [VLC media player](https://en.wikipedia.org/wiki/VLC_media_player). OpenDAP is not tested on animals.
 
 ## Roadmap
 
