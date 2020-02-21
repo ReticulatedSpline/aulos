@@ -9,8 +9,8 @@ class Display(NamedTuple):
     """hold all information necessary to draw a display"""
     menu_path: str
     items: list
-    index: int
-    start_index: int
+    index: int = 0
+    start_index: int = 0
 
     def get_selected_item(self):
         return self.items[self.index + self.start_index]
@@ -81,7 +81,7 @@ class View:
         self.screen.border(0)
         menu_path = self.menu_stack[-1].menu_path
         if menu_path.endswith('home'):
-            title = ' ' + cfg.home_title_str + ' '
+            title = ' ' + cfg.home_icon + ' '
         else:
             title = ' ' + menu_path[5:] + ' '
         title_pos = (self.max_x_chars - len(title)) // 2
@@ -126,7 +126,7 @@ class View:
         """draw the top menu on the menu stack"""
         self._clear_menu_lines()
         display = self.menu_stack[-1]
-        
+
         if not display.items:
             return
 

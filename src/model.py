@@ -6,41 +6,30 @@ from typing import NamedTuple
 from mutagen.easyid3 import EasyID3 as ID3
 
 
-class MediaItem(NamedTuple):
-    index: int
-    path: str
-
-
-class PlaylistItem(NamedTuple):
-    name: str
+class DiskItem(NamedTuple):
     is_dir: bool
-    items: list
+    path: str
 
 
 class Library:
     """handle scanning and storing media"""
     def __init__(self):
         self.music = list()
-        self.scan_playlists()
         for ext in cfg.music_formats:
             file = os.path.join(cfg.music_dir, '*' + ext)
             self.music.extend(glob(file))
 
-    def scan_playlists(self):
-        self.playlists = list()
-        for root, dirs, files in os.walk(cfg.playlist_dir):
-            for filename in files:
-                extention = os.path.splitext(filename)[1]
-                if (not extention) or (extention not in cfg.playlist_formats):
-                    continue
-
-                tracks = list()
-                path = os.path.join(root, filename)
-                with open(path, 'r') as playlist:
-                    for line in playlist:
-                        tracks.append(line.rstrip())
-                item = PlaylistItem(filename, False, tracks)
-                self.playlists.append(item)
+    def get_disk_items(self, root: str):
+        items = list()
+        for item in os.listdir(root):
+            abs_path = os.path.join(root, item)
+            ext = os.path.splitext(abs_path)[-1]
+            if os.path.isfile(abs_path):
+                if ext and (ext in cfg.music_formats or ext in cfg.playlist_formats):
+                    items.append(DiskItem(False, abs_path))
+            elif os.path.isdir(abs_path):
+                items.append(DiskItem(True, abs_path))
+        return items
 
 
 class Player:

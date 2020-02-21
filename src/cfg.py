@@ -6,8 +6,7 @@ music_formats = ('.mp3', '.flac')
 playlist_dir = "playlists"
 playlist_formats = ('.m3u')
 
-# text strings. do not add or remove items.
-home_title_str = u"\u262D"
+# text strings
 no_media_str = "Nothing playing."
 no_load_str = "..."
 song_sep_str = " by "
@@ -29,4 +28,8 @@ song_menu_items = [
     "edit tags",
     "delete track"
 ]
+
+# symbols
 prog_fill = '▒'
+home_icon = u"\u262D"  # ☭
+folder_icon = u"\U0001F4C1"  # 📁
