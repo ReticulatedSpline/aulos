@@ -1,18 +1,15 @@
 import os
 import vlc
-import cfg
 from glob import glob
 from typing import NamedTuple
 from mutagen.easyid3 import EasyID3 as ID3
 
-
-class DiskItem(NamedTuple):
-    is_dir: bool
-    path: str
+import cfg
 
 
 class Library:
     """handle scanning and storing media"""
+
     def __init__(self):
         self.music = list()
         for ext in cfg.music_formats:
@@ -20,15 +17,24 @@ class Library:
             self.music.extend(glob(file))
 
     def get_disk_items(self, root: str):
+        """return a tuple list of items, their paths, & their type:
+            t - track
+            d - dir
+            p - playlist
+        """
         items = list()
+
         for item in os.listdir(root):
             abs_path = os.path.join(root, item)
             ext = os.path.splitext(abs_path)[-1]
-            if os.path.isfile(abs_path):
-                if ext and (ext in cfg.music_formats or ext in cfg.playlist_formats):
-                    items.append(DiskItem(False, abs_path))
-            elif os.path.isdir(abs_path):
-                items.append(DiskItem(True, abs_path))
+            if os.path.isdir(abs_path):
+                items.append(('d', abs_path))
+            elif not ext:
+                continue
+            elif ext in cfg.music_formats:
+                items.append(('t', abs_path))
+            elif ext in cfg.playlist_formats:
+                items.append(('p', abs_path))
         return items
 
 
@@ -83,7 +89,8 @@ class Player:
 
     def skip_forward(self):
         """skip the the beginning of the next track and start playing."""
-        # TODO
+        if len(player.queue) > 1:
+            pass
 
     def skip_back(self):
         """skip to the beginning of the last track and start playing."""

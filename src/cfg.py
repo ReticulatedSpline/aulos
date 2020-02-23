@@ -1,6 +1,6 @@
 """User settings. Change only text between quotes."""
 
-# only listed formats are supported
+# should be able to handle any format VLC can
 music_dir = "music"
 music_formats = ('.mp3', '.flac')
 playlist_dir = "playlists"
@@ -30,6 +30,9 @@ song_menu_items = [
 ]
 
 # symbols
-prog_fill = '▒'
-home_icon = u"\u262D"  # ☭
-folder_icon = u"\U0001F4C1"  # 📁
+prog_fill = u'▒'
+home_icon = u'☭'
+dir_icon = u'❉ '
+menu_icon = u'𝍌 '
+track_icon = u'♬ '
+playlist_icon = u'ᗕ '

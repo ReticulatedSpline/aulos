@@ -2,6 +2,7 @@
 from typing import NamedTuple
 from datetime import timedelta
 import curses
+
 import cfg
 
 
@@ -30,7 +31,8 @@ class View:
 
         # appended to when digging into menus, popped when navigating back
         self.menu_stack = list()
-        home = Display('home', cfg.home_menu_items, 0, 0)
+        items = [('m', item) for item in cfg.home_menu_items]
+        home = Display('home', items, 0, 0)
         self.menu_stack.append(home)
 
         # persistant screen locations
@@ -93,7 +95,8 @@ class View:
         self.screen.addch(middle_border, 0, curses.ACS_LTEE)
         self.screen.addch(middle_border, self.max_x_chars - 1, curses.ACS_RTEE)
         # draw middle border line
-        self.screen.hline(middle_border, 1, curses.ACS_HLINE, self.max_x_chars - 2)
+        self.screen.hline(middle_border, 1, curses.ACS_HLINE,
+                          self.max_x_chars - 2)
 
     def _draw_progress_info(self, metadata):
         if metadata is None:
@@ -132,14 +135,24 @@ class View:
 
         display_items = display.items[display.start_index:]
         for list_index, item in enumerate(display_items, start=1):
-            item = item.replace('\\', "/")
-            item_name = item.split('/')[-1]
             if list_index > self.num_menu_lines:
                 break
-            elif display.index + 1 == list_index:
-                self.screen.addstr(list_index, 1, item_name, curses.A_REVERSE)
+            display_name = item[1].split('/')[-1]
+            item_type = item[0]
+
+            if item_type == 'm':
+                display_name = cfg.menu_icon + display_name
+            elif item_type == 'd':
+                display_name = cfg.dir_icon + display_name
+            elif item_type == 'p':
+                display_name = cfg.playlist_icon + display_name
+            elif item_type == 't':
+                display_name = cfg.track_icon + display_name
+            
+            if display.index + 1 == list_index:
+                self.screen.addstr(list_index, 1, display_name, curses.A_REVERSE)
             else:
-                self.screen.addstr(list_index, 1, item_name)
+                self.screen.addstr(list_index, 1, display_name)
 
     def navigate_up(self, display: Display):
         if display.start_index + display.index > 0:
@@ -174,11 +187,14 @@ class View:
 
         self._clear_progress_lines()
         if (metadata is None) or (not metadata['playing']):
-            self.screen.addstr(self.y_indicies['metadata'], 1, cfg.no_media_str)
-            self.screen.addstr(self.y_indicies['progress_bar'], 1, cfg.no_load_str)
+            self.screen.addstr(
+                self.y_indicies['metadata'], 1, cfg.no_media_str)
+            self.screen.addstr(
+                self.y_indicies['progress_bar'], 1, cfg.no_load_str)
             self.screen.addstr(self.y_indicies['time'], 1, cfg.no_load_str)
         else:
-            song_info = metadata['title'] + cfg.song_sep_str + metadata['artist']
+            song_info = metadata['title'] + \
+                cfg.song_sep_str + metadata['artist']
             self.screen.addstr(self.y_indicies['metadata'], 1, song_info)
             self._draw_progress_info(metadata)
 

@@ -6,12 +6,11 @@ from pynput.keyboard import Listener, KeyCode, Key
 
 import cfg
 from view import View, Display
-from model import Library, Player, DiskItem
+from model import Player, Library
 
 
 class Menu(IntEnum):
     """home menu options"""
-    # TODO: Just compare directly with cfg.home_menu_items[n]?
     PLAYLISTS = 0
     ALBUMS = 1
     ARTISTS = 2
@@ -58,14 +57,30 @@ class Controller:
         elif index == TrackOptions.DELETE_TRACK:
             pass
 
+    def handle_playlist_select(self, item_path: str, display):
+        with open(item_path, 'r') as playlist:
+            tracks = list()
+            for line in playlist:
+                tracks.append(('t', line))
+        new_display = Display(item_path, tracks)
+        self.view.menu_stack.append(new_display)
+
+    def handle_folder_select(self, item_path: str, display):
+        item_name = item_path.split('/')[-1]
+        display_path = display.menu_path + '/' + item_name
+        item_list = self.library.get_disk_items(item_path)
+        new_display = Display(display_path, item_list)
+        self.view.menu_stack.append(new_display)
+
     def handle_select(self):
         display = self.view.menu_stack[-1]
-        selected_item = display.get_selected_item()
-        rel_path = display.menu_path[len('home/playlists'):]
-        new_path = os.path.join(cfg.playlist_dir, rel_path)
-        item_list = self.library.get_disk_items(new_path)
-        new_display = Display(new_path, item_list)
-        self.view.menu_stack.append(new_display)
+        item = display.get_selected_item()
+        if item[0] == 'd':
+            self.handle_folder_select(item[1], display)
+        elif item[0] == 'p':
+            self.handle_playlist_select(item[1], display)
+        elif item[0] == 't':
+            self.handle_song_select()
 
     def handle_home_select(self):
         display = self.view.menu_stack[-1]
@@ -75,8 +90,7 @@ class Controller:
         elif index == Menu.PLAYLISTS:
             path = display.menu_path + '/playlists'
             items = self.library.get_disk_items(cfg.playlist_dir)
-            item_names = [item.path.split(os.sep)[-1] for item in items]
-            display = Display(path, item_names, 0, 0)
+            display = Display(path, items, 0, 0)
             self.view.menu_stack.append(display)
         elif index == Menu.TRACKS:
             path = display.menu_path + '/tracks'
