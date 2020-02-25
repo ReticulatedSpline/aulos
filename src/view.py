@@ -8,8 +8,8 @@ import cfg
 
 class Display(NamedTuple):
     """hold all information necessary to draw a display"""
-    menu_path: str
     items: list
+    menu_path: str = ''
     index: int = 0
     start_index: int = 0
 
@@ -32,7 +32,7 @@ class View:
         # appended to when digging into menus, popped when navigating back
         self.menu_stack = list()
         items = [('m', item) for item in cfg.home_menu_items]
-        home = Display('home', items, 0, 0)
+        home = Display(items)
         self.menu_stack.append(home)
 
         # persistant screen locations
@@ -82,10 +82,10 @@ class View:
     def _draw_borders(self):
         self.screen.border(0)
         menu_path = self.menu_stack[-1].menu_path
-        if menu_path.endswith('home'):
+        if not menu_path:
             title = ' ' + cfg.home_icon + ' '
         else:
-            title = ' ' + menu_path[5:] + ' '
+            title = ' ' + menu_path + ' '
         title_pos = (self.max_x_chars - len(title)) // 2
         self.screen.addstr(0, title_pos, title)
         self.screen.addch(0, title_pos - 1, curses.ACS_RTEE)

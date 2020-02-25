@@ -62,25 +62,15 @@ class Controller:
             tracks = list()
             for line in playlist:
                 tracks.append(('t', line))
-        new_display = Display(item_path, tracks)
+        new_display = Display(tracks, item_path)
         self.view.menu_stack.append(new_display)
 
     def handle_folder_select(self, item_path: str, display):
         item_name = item_path.split('/')[-1]
         display_path = display.menu_path + '/' + item_name
         item_list = self.library.get_disk_items(item_path)
-        new_display = Display(display_path, item_list)
+        new_display = Display(item_list, display_path)
         self.view.menu_stack.append(new_display)
-
-    def handle_select(self):
-        display = self.view.menu_stack[-1]
-        item = display.get_selected_item()
-        if item[0] == 'd':
-            self.handle_folder_select(item[1], display)
-        elif item[0] == 'p':
-            self.handle_playlist_select(item[1], display)
-        elif item[0] == 't':
-            self.handle_song_select()
 
     def handle_home_select(self):
         display = self.view.menu_stack[-1]
@@ -90,11 +80,11 @@ class Controller:
         elif index == Menu.PLAYLISTS:
             path = display.menu_path + '/playlists'
             items = self.library.get_disk_items(cfg.playlist_dir)
-            display = Display(path, items, 0, 0)
+            display = Display(items, path)
             self.view.menu_stack.append(display)
         elif index == Menu.TRACKS:
             path = display.menu_path + '/tracks'
-            display = Display(path, library.music, 0, 0)
+            display = Display(library.music, path)
             self.view.menu_stack.append(display)
         elif index == Menu.ALBUMS:
             self.view.notify("Not yet implemented!")
@@ -108,6 +98,18 @@ class Controller:
             self.view.notify("Not yet implemented!")
         return True
 
+    def handle_select(self):
+        display = self.view.menu_stack[-1]
+        item = display.get_selected_item()
+        if not display.menu_path:
+            return self.handle_home_select()
+        elif item[0] == 'd':
+            self.handle_folder_select(item[1], display)
+        elif item[0] == 'p':
+            self.handle_playlist_select(item[1], display)
+        elif item[0] == 't':
+            self.handle_song_select()
+
     def navigate(self, direction: Direction):
         """handle menu scrolling by manipulating display tuples"""
         display = self.view.menu_stack[-1]
@@ -119,10 +121,7 @@ class Controller:
             if len(self.view.menu_stack) > 1:
                 self.view.menu_stack.pop()
         elif direction is Direction.SELECT:
-            if display.menu_path.endswith('home'):
-                return self.handle_home_select()
-            else:
-                return self.handle_select()
+            return self.handle_select()
 
     def on_press(self, key: KeyCode):
         """Callback for handling user input."""

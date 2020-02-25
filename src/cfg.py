@@ -33,6 +33,6 @@ song_menu_items = [
 prog_fill = u'▒'
 home_icon = u'☭'
 dir_icon = u'❉ '
-menu_icon = u'𝍌 '
+menu_icon = u'➤ '
 track_icon = u'♬ '
 playlist_icon = u'ᗕ '
