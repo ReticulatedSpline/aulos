@@ -1,8 +1,8 @@
 """classes responsible for the user interface"""
+import os
+import curses
 from typing import NamedTuple
 from datetime import timedelta
-import curses
-
 import cfg
 
 
@@ -31,8 +31,8 @@ class View:
 
         # appended to when digging into menus, popped when navigating back
         self.menu_stack = list()
-        items = [('m', item) for item in cfg.home_menu_items]
-        home = Display(items)
+        self.menu_changed: bool = False
+        home = Display([('m', item) for item in cfg.home_menu_items])
         self.menu_stack.append(home)
 
         # persistant screen locations
@@ -45,7 +45,8 @@ class View:
             'progress_bar': self.max_y_chars - 2
         }
 
-        self.update_ui(None)
+        self.update_menu()
+        self.update_status(None)
 
     def __del__(self):
         """restore the previous state of the terminal"""
@@ -125,35 +126,6 @@ class View:
         self.screen.addstr(self.y_indicies['time'], 1, time_str)
         self.screen.addstr(self.y_indicies['progress_bar'], 1, progress_bar)
 
-    def _draw_menu(self):
-        """draw the top menu on the menu stack"""
-        self._clear_menu_lines()
-        display = self.menu_stack[-1]
-
-        if not display.items:
-            return
-
-        display_items = display.items[display.start_index:]
-        for list_index, item in enumerate(display_items, start=1):
-            if list_index > self.num_menu_lines:
-                break
-            display_name = item[1].split(cfg.sep)[-1]
-            item_type = item[0]
-
-            if item_type == 'm':
-                display_name = cfg.menu_icon + display_name
-            elif item_type == 'd':
-                display_name = cfg.dir_icon + display_name
-            elif item_type == 'p':
-                display_name = cfg.playlist_icon + display_name
-            elif item_type == 't':
-                display_name = cfg.track_icon + display_name
-            
-            if display.index + 1 == list_index:
-                self.screen.addstr(list_index, 1, display_name, curses.A_REVERSE)
-            else:
-                self.screen.addstr(list_index, 1, display_name)
-
     def navigate_up(self, display: Display):
         if display.start_index + display.index > 0:
             self.menu_stack.pop()
@@ -177,12 +149,42 @@ class View:
         self.menu_stack.append(display)
 
     def notify(self, string: str):
-        """Add a string to the window. Persistant until overwritten"""
+        """add a string to the window; persistant until overwritten"""
         self._clear_line(self.y_indicies['status'])
         self.screen.addstr(self.y_indicies['status'], 1, string)
         self.screen.refresh()
 
-    def update_ui(self, metadata: dict):
+    def update_menu(self):
+        """draw the top menu on the menu stack"""
+        self._clear_menu_lines()
+        display = self.menu_stack[-1]
+
+        if not display.items:
+            return
+
+        display_items = display.items[display.start_index:]
+        for list_index, item in enumerate(display_items, start=1):
+            if list_index > self.num_menu_lines:
+                break
+            display_name = os.path.basename(item[1])
+            item_type = item[0]
+
+            if item_type == 'm':
+                display_name = cfg.menu_icon + display_name
+            elif item_type == 'd':
+                display_name = cfg.dir_icon + display_name
+            elif item_type == 'p':
+                display_name = cfg.playlist_icon + display_name
+            elif item_type == 't':
+                display_name = cfg.track_icon + display_name
+
+            if display.index + 1 == list_index:
+                self.screen.addstr(list_index, 1, display_name, curses.A_REVERSE)
+            else:
+                self.screen.addstr(list_index, 1, display_name)
+        self.menu_changed = False
+
+    def update_status(self, metadata: dict):
         """Update track metadata and progress indicators."""
 
         self._clear_progress_lines()
@@ -197,8 +199,4 @@ class View:
                 cfg.song_sep_str + metadata['artist']
             self.screen.addstr(self.y_indicies['metadata'], 1, song_info)
             self._draw_progress_info(metadata)
-
-        self._draw_menu()
-        self._draw_borders()
-        display = self.menu_stack[-1]
         self.screen.refresh()

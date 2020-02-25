@@ -1,5 +1,6 @@
 """gobetween for view & model"""
 import os
+from time import sleep
 from enum import IntEnum
 from functools import partial
 from pynput.keyboard import Listener, KeyCode, Key
@@ -67,7 +68,7 @@ class Controller:
 
     def handle_folder_select(self, item_path: str, display):
         item_name = item_path.split(os.sep)[-1]
-        display_path = display.menu_path + cfg.sep + item_name
+        display_path = display.menu_path + os.sep + item_name
         item_list = self.library.get_disk_items(item_path)
         new_display = Display(item_list, display_path)
         self.view.menu_stack.append(new_display)
@@ -75,16 +76,15 @@ class Controller:
     def handle_home_select(self):
         display = self.view.menu_stack[-1]
         index = display.index + display.start_index
-        path = cfg.sep
         if index == Menu.EXIT:
             return False
         elif index == Menu.PLAYLISTS:
-            path += 'playlists'
+            path = 'playlists'
             items = self.library.get_disk_items(cfg.playlist_dir)
             display = Display(items, path)
             self.view.menu_stack.append(display)
         elif index == Menu.TRACKS:
-            path += 'tracks'
+            path = 'tracks'
             display = Display(self.library.music, path)
             self.view.menu_stack.append(display)
         elif index == Menu.ALBUMS:
@@ -114,6 +114,7 @@ class Controller:
     def navigate(self, direction: Direction):
         """handle menu scrolling by manipulating display tuples"""
         display = self.view.menu_stack[-1]
+        self.view.menu_changed = True
         if direction is Direction.UP:
             self.view.navigate_up(display)
         elif direction is Direction.DOWN:
@@ -149,8 +150,11 @@ class Controller:
 
     def tick(self):
         """periodic ui update"""
-        metadata = self.player.get_metadata()
-        self.view.update_ui(metadata)
+        if self.player.is_playing():
+            metadata = self.player.get_metadata()
+            self.view.update_status(metadata)
+        if self.view.menu_changed:
+            self.view.update_menu()
 
     def run(self):
         """splits into two threads for ui and pynput"""
@@ -158,3 +162,4 @@ class Controller:
         listener.start()
         while listener.running:
             self.tick()
+            sleep(cfg.refresh_rate)

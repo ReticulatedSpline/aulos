@@ -79,6 +79,9 @@ class Player:
                     "run_time": run_time}
             return info
 
+    def is_playing(self):
+        return 0 >= self.player.get_time()
+
     def play(self):
         """start playing the current track."""
         self.player.play()
@@ -89,7 +92,7 @@ class Player:
 
     def skip_forward(self):
         """skip the the beginning of the next track and start playing."""
-        if len(player.queue) > 1:
+        if len(self.player.queue) > 1:
             pass
 
     def skip_back(self):

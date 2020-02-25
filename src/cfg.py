@@ -1,7 +1,7 @@
 """User settings. Change only text between quotes."""
-import os
 
-sep = os.path.sep
+# in seconds
+refresh_rate = 0.02
 
 # should be able to handle any format VLC can
 music_dir = "music"
