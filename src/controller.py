@@ -66,8 +66,8 @@ class Controller:
         self.view.menu_stack.append(new_display)
 
     def handle_folder_select(self, item_path: str, display):
-        item_name = item_path.split('/')[-1]
-        display_path = display.menu_path + '/' + item_name
+        item_name = item_path.split(os.sep)[-1]
+        display_path = display.menu_path + cfg.sep + item_name
         item_list = self.library.get_disk_items(item_path)
         new_display = Display(item_list, display_path)
         self.view.menu_stack.append(new_display)
@@ -75,16 +75,17 @@ class Controller:
     def handle_home_select(self):
         display = self.view.menu_stack[-1]
         index = display.index + display.start_index
+        path = cfg.sep
         if index == Menu.EXIT:
             return False
         elif index == Menu.PLAYLISTS:
-            path = display.menu_path + '/playlists'
+            path += 'playlists'
             items = self.library.get_disk_items(cfg.playlist_dir)
             display = Display(items, path)
             self.view.menu_stack.append(display)
         elif index == Menu.TRACKS:
-            path = display.menu_path + '/tracks'
-            display = Display(library.music, path)
+            path += 'tracks'
+            display = Display(self.library.music, path)
             self.view.menu_stack.append(display)
         elif index == Menu.ALBUMS:
             self.view.notify("Not yet implemented!")

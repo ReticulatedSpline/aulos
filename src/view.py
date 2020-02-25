@@ -137,7 +137,7 @@ class View:
         for list_index, item in enumerate(display_items, start=1):
             if list_index > self.num_menu_lines:
                 break
-            display_name = item[1].split('/')[-1]
+            display_name = item[1].split(cfg.sep)[-1]
             item_type = item[0]
 
             if item_type == 'm':
