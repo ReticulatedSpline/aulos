@@ -5,7 +5,8 @@ from functools import partial
 from pynput.keyboard import Listener, KeyCode, Key
 
 import cfg
-from view import View, Display
+from display import ItemType, Display
+from view import View
 from model import Player, Library
 
 
@@ -48,18 +49,18 @@ class Controller:
     def handle_song_select(self):
         display = self.view.menu_stack[-1]
         index = display.index + display.start_index
-        if index == TrackOptions.PLAY_NOW:
+        if index == MediaOptions.PLAY_NOW:
             pass
-        elif index == TrackOptions.PLAY_NEXT:
+        elif index == MediaOptions.PLAY_NEXT:
             pass
-        elif index == TrackOptions.PLAY_LAST:
+        elif index == MediaOptions.PLAY_LAST:
             pass
-        elif index == TrackOptions.EDIT_TAGS:
+        elif index == MediaOptions.EDIT_TAGS:
             pass
-        elif index == TrackOptions.DELETE_TRACK:
+        elif index == MediaOptions.DELETE_TRACK:
             pass
 
-    def handle_playlist_select_view():
+    def handle_playlist_select_view(self, item_path: str):
         with open(item_path, 'r') as playlist:
             tracks = list()
             for line in playlist:
@@ -67,14 +68,14 @@ class Controller:
         new_display = Display(tracks, item_path)
         self.view.menu_stack.append(new_display)
 
-    def handle_playlist_select(self, item_path: str, display):
+    def handle_media_select(self, item_path: str, display):
         items = list()
         for opt in cfg.media_option_items:
             items.append(('m', opt))
         new_display = Display(items, item_path)
         self.view.menu_stack.append(new_display)
 
-    def handle_folder_select(self, item_path: str, display):
+    def handle_dir_select(self, item_path: str, display):
         item_name = item_path.split(os.sep)[-1]
         display_path = display.menu_path + os.sep + item_name
         item_list = self.library.get_disk_items(item_path)
@@ -87,13 +88,13 @@ class Controller:
         if index == Menu.EXIT:
             return False
         elif index == Menu.PLAYLISTS:
-            path = 'playlists'
+            path = cfg.home_menu_items[Menu.PLAYLISTS]
             items = self.library.get_disk_items(cfg.playlist_dir)
             display = Display(items, path)
             self.view.menu_stack.append(display)
         elif index == Menu.TRACKS:
-            path = 'tracks'
-            display = Display(self.library.music, path)
+            path = cfg.home_menu_items[Menu.TRACKS]
+            display = Display(self.library.get_tracks(), path)
             self.view.menu_stack.append(display)
         elif index == Menu.ALBUMS:
             self.view.notify("Not yet implemented!")
@@ -109,15 +110,13 @@ class Controller:
 
     def handle_select(self):
         display = self.view.menu_stack[-1]
-        item = display.get_selected_item()
+        item: DisplayItem = display.get_selected_item()
         if not display.menu_path:
             return self.handle_home_select()
-        elif item[0] == 'd':
-            self.handle_folder_select(item[1], display)
-        elif item[0] == 'p':
-            self.handle_playlist_select(item[1], display)
-        elif item[0] == 't':
-            self.handle_song_select()
+        elif item.item_type is ItemType.Directory:
+            self.handle_dir_select(item.path, display)
+        elif item.item_type in (ItemType.Track, ItemType.Playlist):
+            self.handle_media_select(item.path, display)
 
     def navigate(self, direction: Direction):
         """handle menu scrolling by manipulating display tuples"""

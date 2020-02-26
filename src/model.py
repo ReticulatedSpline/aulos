@@ -4,6 +4,7 @@ from glob import glob
 from typing import NamedTuple
 from mutagen.easyid3 import EasyID3 as ID3
 
+from display import DisplayItem, ItemType
 import cfg
 
 
@@ -16,25 +17,24 @@ class Library:
             file = os.path.join(cfg.music_dir, '*' + ext)
             self.music.extend(glob(file))
 
+    def get_tracks(self):
+        return [DisplayItem(ItemType.Track, path) for path in self.music]
+
     def get_disk_items(self, root: str):
-        """return a tuple list of items, their paths, & their type:
-            t - track
-            d - dir
-            p - playlist
-        """
+        """return a tuple list of items, their paths, & their type"""
         items = list()
 
         for item in os.listdir(root):
             abs_path = os.path.join(root, item)
             ext = os.path.splitext(abs_path)[-1]
             if os.path.isdir(abs_path):
-                items.append(('d', abs_path))
+                items.append(DisplayItem(ItemType.Directory, abs_path))
             elif not ext:
                 continue
             elif ext in cfg.music_formats:
-                items.append(('t', abs_path))
+                items.append(DisplayItem(ItemType.Track, abs_path))
             elif ext in cfg.playlist_formats:
-                items.append(('p', abs_path))
+                items.append(DisplayItem(ItemType.Playlist, abs_path))
         return items
 
 

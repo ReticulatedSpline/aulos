@@ -1,25 +1,10 @@
 """classes responsible for the user interface"""
 import os
 import curses
-from typing import NamedTuple
 from datetime import timedelta
+
+from display import Display
 import cfg
-
-
-class Display(NamedTuple):
-    """hold all information necessary to draw a display"""
-    items: list  # (type, path)
-    menu_path: str = ''
-    index: int = 0
-    start_index: int = 0
-
-    def get_selected_item(self):
-        return self.items[self.index + self.start_index]
-
-    def __str__(self):
-        str_rep = f'display "{self.menu_path}" has {len(self.items)} items. '
-        str_rep += f'starting at {self.start_index}, ({self.index} selected). '
-        return str_rep
 
 
 class View:
