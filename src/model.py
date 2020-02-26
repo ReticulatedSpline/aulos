@@ -8,7 +8,7 @@ import cfg
 
 
 class Library:
-    """handle scanning and storing media"""
+    """handle scanning and indexing media"""
 
     def __init__(self):
         self.music = list()

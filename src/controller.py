@@ -59,12 +59,19 @@ class Controller:
         elif index == TrackOptions.DELETE_TRACK:
             pass
 
-    def handle_playlist_select(self, item_path: str, display):
+    def handle_playlist_select_view():
         with open(item_path, 'r') as playlist:
             tracks = list()
             for line in playlist:
                 tracks.append(('t', line))
         new_display = Display(tracks, item_path)
+        self.view.menu_stack.append(new_display)
+
+    def handle_playlist_select(self, item_path: str, display):
+        items = list()
+        for opt in cfg.media_option_items:
+            items.append(('m', opt))
+        new_display = Display(items, item_path)
         self.view.menu_stack.append(new_display)
 
     def handle_folder_select(self, item_path: str, display):

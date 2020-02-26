@@ -8,7 +8,7 @@ import cfg
 
 class Display(NamedTuple):
     """hold all information necessary to draw a display"""
-    items: list
+    items: list  # (type, path)
     menu_path: str = ''
     index: int = 0
     start_index: int = 0
