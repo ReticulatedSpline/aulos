@@ -24,18 +24,18 @@ home_menu_items = [
     "settings",
     "quit"
 ]
-song_menu_items = [
-    "play now",
-    "play next",
-    "play last",
-    "edit tags",
-    "delete track"
+media_option_items = [
+    "play",
+    "view",
+    "queue next",
+    "queue last",
+    "delete"
 ]
 
 # symbols
 prog_fill = u'▒'
 home_icon = u'☭'
-dir_icon = u'❉ '
+dir_icon = u'ᗕ '
 menu_icon = u'➤ '
 track_icon = u'♬ '
-playlist_icon = u'ᗕ '
+playlist_icon = u'✎ '

@@ -1,4 +1,3 @@
-"""gobetween for view & model"""
 import os
 from time import sleep
 from enum import IntEnum
@@ -30,15 +29,17 @@ class Direction(IntEnum):
     BACK = 4
 
 
-class TrackOptions(IntEnum):
-    PLAY_NOW = 1
-    PLAY_NEXT = 2
-    PLAY_LAST = 3
-    EDIT_TAGS = 4
-    DELETE_TRACK = 5
+class MediaOptions(IntEnum):
+    """options for playlists, library subsets, and single tracks"""
+    PLAY = 1
+    VIEW = 2
+    QUEUE_NEXT = 3
+    QUEUE_LAST = 4
+    DELETE = 5
 
 
 class Controller:
+    """handle menu transitions, and act as gobetween for model/view"""
     def __init__(self):
         self.view = View()
         self.library = Library()
