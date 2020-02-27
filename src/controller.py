@@ -5,7 +5,7 @@ from functools import partial
 from pynput.keyboard import Listener, KeyCode, Key
 
 import cfg
-from display import ItemType, Display
+from display import ItemType, Display, DisplayItem
 from view import View
 from model import Player, Library
 
@@ -64,14 +64,14 @@ class Controller:
         with open(item_path, 'r') as playlist:
             tracks = list()
             for line in playlist:
-                tracks.append(('t', line))
+                tracks.append(DisplayItem(ItemType.Track, line))
         new_display = Display(tracks, item_path)
         self.view.menu_stack.append(new_display)
 
     def handle_media_select(self, item_path: str, display):
         items = list()
         for opt in cfg.media_option_items:
-            items.append(('m', opt))
+            items.append(DisplayItem(ItemType.Menu, opt))
         new_display = Display(items, item_path)
         self.view.menu_stack.append(new_display)
 
@@ -157,9 +157,8 @@ class Controller:
 
     def tick(self):
         """periodic ui update"""
-        if self.player.is_playing():
-            metadata = self.player.get_metadata()
-            self.view.update_status(metadata)
+        metadata = self.player.get_metadata()
+        self.view.update_status(metadata)
         if self.view.menu_changed:
             self.view.update_menu()
 

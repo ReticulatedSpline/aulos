@@ -3,7 +3,7 @@ import os
 import curses
 from datetime import timedelta
 
-from display import Display
+from display import Display, DisplayItem, ItemType
 import cfg
 
 
@@ -17,8 +17,11 @@ class View:
         # appended to when digging into menus, popped when navigating back
         self.menu_stack = list()
         self.menu_changed: bool = False
-        home = Display([('m', item) for item in cfg.home_menu_items])
-        self.menu_stack.append(home)
+
+        home_items = list()
+        for item in cfg.home_menu_items:
+            home_items.append(DisplayItem(ItemType.Menu, item))
+        self.menu_stack.append(Display(home_items, ''))
 
         # persistant screen locations
         self.max_y_chars, self.max_x_chars = self.screen.getmaxyx()
@@ -151,16 +154,15 @@ class View:
         for list_index, item in enumerate(display_items, start=1):
             if list_index > self.num_menu_lines:
                 break
-            display_name = os.path.basename(item[1])
-            item_type = item[0]
+            display_name = os.path.basename(item.path)
 
-            if item_type == 'm':
+            if item.item_type is ItemType.Menu:
                 display_name = cfg.menu_icon + display_name
-            elif item_type == 'd':
+            elif item.item_type is ItemType.Directory:
                 display_name = cfg.dir_icon + display_name
-            elif item_type == 'p':
+            elif item.item_type is ItemType.Playlist:
                 display_name = cfg.playlist_icon + display_name
-            elif item_type == 't':
+            elif item.item_type is ItemType.Track:
                 display_name = cfg.track_icon + display_name
 
             if display.index + 1 == list_index:
