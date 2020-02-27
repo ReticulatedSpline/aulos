@@ -114,7 +114,8 @@ class View:
         self.screen.addstr(self.y_indicies['time'], 1, time_str)
         self.screen.addstr(self.y_indicies['progress_bar'], 1, progress_bar)
 
-    def navigate_up(self, display: Display):
+    def navigate_up(self):
+        display = self.menu_stack[-1]
         if display.start_index + display.index > 0:
             self.menu_stack.pop()
             index = display.index
@@ -127,7 +128,8 @@ class View:
             display = display._replace(index=index, start_index=start_index)
             self.menu_stack.append(display)
 
-    def navigate_down(self, display: Display):
+    def navigate_down(self):
+        display = self.menu_stack[-1]
         if display.start_index + display.index < len(display.items) - 1:
             display = self.menu_stack.pop()
             display = display._replace(index=display.index + 1)
@@ -135,6 +137,10 @@ class View:
                 start_index = display.start_index + self.num_menu_lines
                 display = display._replace(index=0, start_index=start_index)
         self.menu_stack.append(display)
+
+    def navigate_back(self):
+        if len(self.menu_stack) > 1:
+            self.menu_stack.pop()
 
     def notify(self, string: str):
         """add a string to the window; persistant until overwritten"""

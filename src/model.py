@@ -46,11 +46,6 @@ class Player:
         self.queue = list()
         self.vlc = vlc.Instance()
         self.player = self.vlc.media_player_new()
-        self._update_song()
-
-    def get_id3(self, file: str, key: str):
-        metadata = ID3(file)
-        return str(metadata[key]).strip('[\']')
 
     def get_metadata(self):
         """Return a dictionary of title, artist, current/total runtimes."""
@@ -65,8 +60,8 @@ class Player:
         else:
             playing = True
         info = {"playing": playing,
-                "title": self.get_id3('title'),
-                "artist": self.get_id3('artist'),
+                "title": None,
+                "artist": None,
                 "curr_time": curr_time,
                 "run_time": run_time}
         return info

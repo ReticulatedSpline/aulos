@@ -32,11 +32,11 @@ class Direction(IntEnum):
 
 class MediaOptions(IntEnum):
     """options for playlists, library subsets, and single tracks"""
-    PLAY = 1
-    VIEW = 2
-    QUEUE_NEXT = 3
-    QUEUE_LAST = 4
-    DELETE = 5
+    PLAY = 0
+    VIEW = 1
+    QUEUE_NEXT = 2
+    QUEUE_LAST = 3
+    DELETE = 4
 
 
 class Controller:
@@ -60,12 +60,14 @@ class Controller:
         elif index == MediaOptions.DELETE_TRACK:
             pass
 
-    def handle_playlist_select_view(self, item_path: str):
-        with open(item_path, 'r') as playlist:
+    def handle_playlist_select_view(self, file_path: str):
+        if not os.path.isfile(file_path):
+            return
+        with open(file_path, 'r') as playlist:
             tracks = list()
             for line in playlist:
                 tracks.append(DisplayItem(ItemType.Track, line))
-        new_display = Display(tracks, item_path)
+        new_display = Display(tracks, file_path)
         self.view.menu_stack.append(new_display)
 
     def handle_media_select(self, item_path: str, display):
@@ -109,10 +111,15 @@ class Controller:
         return True
 
     def handle_select(self):
-        display = self.view.menu_stack[-1]
+        display: Display = self.view.menu_stack[-1]
         item: DisplayItem = display.get_selected_item()
+        ext: str = os.path.splitext(display.menu_path)[1]
         if not display.menu_path:
             return self.handle_home_select()
+        elif item.item_type is ItemType.Menu:
+            if ext in cfg.playlist_formats:
+                if item.path == cfg.media_option_items[MediaOptions.VIEW]:
+                    self.handle_playlist_select_view(display.menu_path)
         elif item.item_type is ItemType.Directory:
             self.handle_dir_select(item.path, display)
         elif item.item_type in (ItemType.Track, ItemType.Playlist):
@@ -120,15 +127,13 @@ class Controller:
 
     def navigate(self, direction: Direction):
         """handle menu scrolling by manipulating display tuples"""
-        display = self.view.menu_stack[-1]
         self.view.menu_changed = True
         if direction is Direction.UP:
-            self.view.navigate_up(display)
+            self.view.navigate_up()
         elif direction is Direction.DOWN:
-            self.view.navigate_down(display)
+            self.view.navigate_down()
         elif direction is Direction.BACK:
-            if len(self.view.menu_stack) > 1:
-                self.view.menu_stack.pop()
+            self.view.navigate_back()
         elif direction is Direction.SELECT:
             return self.handle_select()
 
@@ -145,7 +150,6 @@ class Controller:
                 self.player.skip_back()
             return True
         else:
-            action = None
             if key == Key.up:
                 return self.navigate(Direction.UP)
             elif key == Key.down:
