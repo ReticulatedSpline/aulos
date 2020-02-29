@@ -66,11 +66,11 @@ class Controller:
         with open(file_path, 'r') as playlist:
             tracks = list()
             for line in playlist:
-                tracks.append(DisplayItem(ItemType.Track, line))
+                tracks.append(DisplayItem(ItemType.Track, line.rstrip()))
         new_display = Display(tracks, file_path)
         self.view.menu_stack.append(new_display)
 
-    def handle_media_select(self, item_path: str, display):
+    def handle_media_select(self, item_path: str, display: Display):
         items = list()
         for opt in cfg.media_option_items:
             items.append(DisplayItem(ItemType.Menu, opt))
@@ -120,6 +120,9 @@ class Controller:
             if ext in cfg.playlist_formats:
                 if item.path == cfg.media_option_items[MediaOptions.VIEW]:
                     self.handle_playlist_select_view(display.menu_path)
+                if item.path == cfg.media_option_items[MediaOptions.PLAY]:
+                    if not self.player.play(item.path):
+                        self.view.notify(cfg.play_error_str)
         elif item.item_type is ItemType.Directory:
             self.handle_dir_select(item.path, display)
         elif item.item_type in (ItemType.Track, ItemType.Playlist):
@@ -163,8 +166,7 @@ class Controller:
         """periodic ui update"""
         metadata = self.player.get_metadata()
         self.view.update_status(metadata)
-        if self.view.menu_changed:
-            self.view.update_menu()
+        self.view.update_menu()
 
     def run(self):
         """splits into two threads for ui and pynput"""

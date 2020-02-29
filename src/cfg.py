@@ -12,6 +12,7 @@ playlist_formats = ('.m3u')
 # text strings
 no_media_str = "Nothing playing."
 no_load_str = "..."
+play_error_str = "Couldn't play file."
 song_sep_str = " by "
 time_sep_str = " of "
 home_menu_items = [

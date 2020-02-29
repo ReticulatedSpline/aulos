@@ -1,9 +1,8 @@
 import os
 import vlc
 from glob import glob
-from typing import NamedTuple
-from mutagen.easyid3 import EasyID3 as ID3
-from urllib.parse import unquote
+from mutagen.easyid3 import EasyID3 as get_tags
+
 
 from display import DisplayItem, ItemType
 import cfg
@@ -14,6 +13,7 @@ class Library:
 
     def __init__(self):
         self.music = list()
+        self.last_played = list()
         for ext in cfg.music_formats:
             file = os.path.join(cfg.music_dir, '*' + ext)
             self.music.extend(glob(file))
@@ -43,42 +43,66 @@ class Player:
     """track player state and wrap calls to VLC"""
 
     def __init__(self, library: Library):
-        self.queue = list()
-        self.vlc = vlc.Instance()
-        self.player = self.vlc.media_player_new()
+        self.queue: list = library.music
+        self.played: list = list()
+        self.curr_track: MediaPlayer = vlc.MediaPlayer(self.queue[0])
+        self.curr_track_path: str = self.queue[0]
+        self.played.append(self.queue.pop())
 
     def get_metadata(self):
-        """Return a dictionary of title, artist, current/total runtimes."""
-        # default states when not playing a track are negative integers
-        curr_time = self.player.get_time() / 1000   # time returned in ms
+        """return a dictionary of current song's metadata"""
+        if not self.curr_track:
+            return None
+
+        curr_time = self.curr_track.get_time() / 1000   # time returned in ms
         if curr_time < 0:
             curr_time = 0
-        run_time = self.player.get_length() / 1000
-        if run_time < 0:
-            run_time = 0
-            playing = False
+        run_time = self.curr_track.get_length() / 1000
+        metadata = get_tags(self.curr_track_path)
+        if not metadata:
+            return
         else:
-            playing = True
-        info = {"playing": playing,
-                "title": None,
-                "artist": None,
-                "curr_time": curr_time,
-                "run_time": run_time}
-        return info
+            return {"title": metadata['title'],
+                    "artist": metadata['artist'],
+                    "album": metadata['album'],
+                    "curr_time": curr_time,
+                    "run_time": run_time}
 
-    def play(self):
-        """start playing the current track."""
-        self.player.play()
+    def play(self, track=None):
+        """start playing the current or passed track"""
+        if track and os.path.isfile(track):
+            self.curr_track = vlc.MediaPlayer(track)
+        if self.curr_track:
+            self.curr_track.play()
 
     def pause(self):
-        """pause the current track. position is preserved."""
-        self.player.pause()
+        """pause the current track, preserving position"""
+        if self.curr_track:
+            self.curr_track.pause()
+
+    def enqueue(items: list):
+        self.queue = self.queue + items
 
     def skip_forward(self):
-        """skip the the beginning of the next track and start playing."""
-        if len(self.player.queue) > 1:
-            pass
+        """skip the the beginning of the next track"""
+        if len(self.queue) <= 1:
+            return
+        song_path = queue.pop()
+        if not os.path.isfile(song_path):
+            return
+        self.curr_track_path = song_path
+        self.curr_track = vlc.MediaPlayer(song_path)
+        played.append(song_path)
+        self.play()
 
     def skip_back(self):
-        """skip to the beginning of the last track and start playing."""
-        # TODO
+        """skip to the beginning of the last track"""
+        if len(self.played) <= 1:
+            return
+        song_path = last.pop()
+        if not os.path.isfile(song_path):
+            return
+        self.curr_track_path = song_path
+        self.curr_track = vlc.MediaPlayer(song_path)
+        queue.append(song_path)
+        self.play()

@@ -16,7 +16,6 @@ class View:
 
         # appended to when digging into menus, popped when navigating back
         self.menu_stack = list()
-        self.menu_changed: bool = False
 
         home_items = list()
         for item in cfg.home_menu_items:
