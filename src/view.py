@@ -1,5 +1,6 @@
 """classes responsible for the user interface"""
 import os
+import sys
 import curses
 from datetime import timedelta
 
@@ -14,9 +15,7 @@ class View:
         self.screen = curses.initscr()
         curses.curs_set(False)
 
-        # appended to when digging into menus, popped when navigating back
         self.menu_stack = list()
-
         home_items = list()
         for item in cfg.home_menu_items:
             home_items.append(DisplayItem(ItemType.Menu, item))
@@ -180,15 +179,16 @@ class View:
         """Update track metadata and progress indicators."""
 
         self._clear_progress_lines()
-        if (metadata is None) or (not metadata['playing']):
+        if metadata is None:
             self.screen.addstr(
                 self.y_indicies['metadata'], 1, cfg.no_media_str)
             self.screen.addstr(
                 self.y_indicies['progress_bar'], 1, cfg.no_load_str)
             self.screen.addstr(self.y_indicies['time'], 1, cfg.no_load_str)
         else:
-            song_info = metadata['title'] + \
-                cfg.song_sep_str + metadata['artist']
+            title = metadata['title'][0]
+            artist = metadata['artist'][0]
+            song_info = title + cfg.song_sep_str + artist
             self.screen.addstr(self.y_indicies['metadata'], 1, song_info)
             self._draw_progress_info(metadata)
         self.screen.refresh()

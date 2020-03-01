@@ -48,9 +48,9 @@ class Controller:
 
     def handle_song_select(self):
         display = self.view.menu_stack[-1]
-        index = display.index + display.start_index
+        selected_item = display.get_selected_item()
         if index == MediaOptions.PLAY_NOW:
-            pass
+            self.player.play(selected_item.path)
         elif index == MediaOptions.PLAY_NEXT:
             pass
         elif index == MediaOptions.PLAY_LAST:
@@ -99,15 +99,15 @@ class Controller:
             display = Display(self.library.get_tracks(), path)
             self.view.menu_stack.append(display)
         elif index == Menu.ALBUMS:
-            self.view.notify("Not yet implemented!")
+            self.view.notify(cfg.not_implemented_str)
         elif index == Menu.ARTISTS:
-            self.view.notify("Not yet implemented!")
+            self.view.notify(cfg.not_implemented_str)
         elif index == Menu.GENRES:
-            self.view.notify("Not yet implemented!")
+            self.view.notify(cfg.not_implemented_str)
         elif index == Menu.QUEUE:
-            self.view.notify("Not yet implemented!")
+            self.view.notify(cfg.not_implemented_str)
         elif index == Menu.SETTINGS:
-            self.view.notify("Not yet implemented!")
+            self.view.notify(cfg.not_implemented_str)
         return True
 
     def handle_select(self):
@@ -128,18 +128,6 @@ class Controller:
         elif item.item_type in (ItemType.Track, ItemType.Playlist):
             self.handle_media_select(item.path, display)
 
-    def navigate(self, direction: Direction):
-        """handle menu scrolling by manipulating display tuples"""
-        self.view.menu_changed = True
-        if direction is Direction.UP:
-            self.view.navigate_up()
-        elif direction is Direction.DOWN:
-            self.view.navigate_down()
-        elif direction is Direction.BACK:
-            self.view.navigate_back()
-        elif direction is Direction.SELECT:
-            return self.handle_select()
-
     def on_press(self, key: KeyCode):
         """Callback for handling user input."""
         if hasattr(key, 'char'):
@@ -154,13 +142,13 @@ class Controller:
             return True
         else:
             if key == Key.up:
-                return self.navigate(Direction.UP)
+                self.view.navigate_up()
             elif key == Key.down:
-                return self.navigate(Direction.DOWN)
+                self.view.navigate_down()
             elif key == Key.right:
-                return self.navigate(Direction.SELECT)
+                return self.handle_select()
             elif key == Key.left:
-                return self.navigate(Direction.BACK)
+                self.view.navigate_back()
 
     def tick(self):
         """periodic ui update"""
@@ -171,7 +159,12 @@ class Controller:
     def run(self):
         """splits into two threads for ui and pynput"""
         listener = Listener(on_press=self.on_press)
-        listener.start()
-        while listener.running:
-            self.tick()
-            sleep(cfg.refresh_rate)
+        try:
+            listener.start()
+            while listener.running:
+                self.tick()
+                # sleep(cfg.refresh_rate)
+        finally:
+            del self.view
+            del self.player
+            del self.library

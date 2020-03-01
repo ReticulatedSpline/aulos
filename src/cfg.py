@@ -13,6 +13,7 @@ playlist_formats = ('.m3u')
 no_media_str = "Nothing playing."
 no_load_str = "..."
 play_error_str = "Couldn't play file."
+not_implemented_str = "Not yet implemented!"
 song_sep_str = " by "
 time_sep_str = " of "
 home_menu_items = [
@@ -35,7 +36,7 @@ media_option_items = [
 
 # symbols
 prog_fill = u'▒'
-home_icon = u'☭'
+home_icon = u'☯'
 dir_icon = u'ᗕ '
 menu_icon = u'➤ '
 track_icon = u'♬ '

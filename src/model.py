@@ -45,8 +45,8 @@ class Player:
     def __init__(self, library: Library):
         self.queue: list = library.music
         self.played: list = list()
-        self.curr_track: MediaPlayer = vlc.MediaPlayer(self.queue[0])
         self.curr_track_path: str = self.queue[0]
+        self.curr_track: MediaPlayer = vlc.MediaPlayer(self.curr_track_path)
         self.played.append(self.queue.pop())
 
     def get_metadata(self):
@@ -68,12 +68,14 @@ class Player:
                     "curr_time": curr_time,
                     "run_time": run_time}
 
-    def play(self, track=None):
+    def play(self, media=None):
         """start playing the current or passed track"""
-        if track and os.path.isfile(track):
-            self.curr_track = vlc.MediaPlayer(track)
-        if self.curr_track:
-            self.curr_track.play()
+        if not media:
+            return
+        if media is list:
+            self.queue.extend(media)
+        self.curr_track = vlc.MediaPlayer(self.queue.pop())
+        self.curr_track.play()
 
     def pause(self):
         """pause the current track, preserving position"""
@@ -87,7 +89,7 @@ class Player:
         """skip the the beginning of the next track"""
         if len(self.queue) <= 1:
             return
-        song_path = queue.pop()
+        song_path = self.queue.pop()
         if not os.path.isfile(song_path):
             return
         self.curr_track_path = song_path
@@ -104,5 +106,5 @@ class Player:
             return
         self.curr_track_path = song_path
         self.curr_track = vlc.MediaPlayer(song_path)
-        queue.append(song_path)
+        self.queue.append(song_path)
         self.play()
