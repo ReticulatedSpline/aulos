@@ -53,20 +53,21 @@ class Player:
         """return a dictionary of current song's metadata"""
         if not self.curr_track:
             return None
-
-        curr_time = self.curr_track.get_time() / 1000   # time returned in ms
-        if curr_time < 0:
-            curr_time = 0
-        run_time = self.curr_track.get_length() / 1000
         metadata = get_tags(self.curr_track_path)
         if not metadata:
             return
-        else:
-            return {"title": metadata['title'],
-                    "artist": metadata['artist'],
-                    "album": metadata['album'],
-                    "curr_time": curr_time,
-                    "run_time": run_time}
+        curr_time = self.curr_track.get_time() / 1000   # time returned in ms
+        if curr_time < 0:
+            curr_time = 0
+        run_time = self.curr_track.get_length()  # -1 indicates no media
+        run_time = 0 if run_time < 0 else run_time / 1000  # millisec to sec
+        playing = True if self.curr_track.is_playing() else False
+        return {"playing": playing,
+                "title": metadata['title'],
+                "artist": metadata['artist'],
+                "album": metadata['album'],
+                "curr_time": curr_time,
+                "run_time": run_time}
 
     def play(self, media=None):
         """start playing the current or passed track"""

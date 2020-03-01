@@ -1,7 +1,7 @@
-"""User settings. Change only text between quotes."""
+"""user settings"""
 
-# in seconds
-refresh_rate = 0.02
+# in seconds, lower should be more responsive
+refresh_rate = 0.01
 
 # should be able to handle any format VLC can
 music_dir = "music"
@@ -10,12 +10,12 @@ playlist_dir = "playlists"
 playlist_formats = ('.m3u')
 
 # text strings
-no_media_str = "Nothing playing."
 no_load_str = "..."
-play_error_str = "Couldn't play file."
-not_implemented_str = "Not yet implemented!"
 song_sep_str = " by "
 time_sep_str = " of "
+no_media_str = "Nothing playing."
+play_error_str = "Couldn't play file."
+not_implemented_str = "Not yet implemented!"
 home_menu_items = [
     "playlists",
     "albums",
@@ -35,9 +35,10 @@ media_option_items = [
 ]
 
 # symbols
-prog_fill = u'▒'
 home_icon = u'☯'
 dir_icon = u'ᗕ '
 menu_icon = u'➤ '
 track_icon = u'♬ '
 playlist_icon = u'✎ '
+progress_bar_fill_char = u'▓'
+progress_bar_empty_char = u'░'

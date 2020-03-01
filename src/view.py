@@ -31,12 +31,17 @@ class View:
             'progress_bar': self.max_y_chars - 2
         }
 
+        # consume stdin as pynput is handling listening
+        self.save_stdin = sys.stdin
+        sys.stdin = open("last_session.log", 'w')
+        sys.stdin.truncate(0)
         self.update_menu()
         self.update_status(None)
 
     def __del__(self):
         """restore the previous state of the terminal"""
         curses.endwin()
+        sys.stdin = self.save_stdin
 
     @staticmethod
     def _strfdelta(tdelta: timedelta):
@@ -61,7 +66,7 @@ class View:
         for line in list(range(1, self.num_menu_lines + 1)):
             self._clear_line(line)
 
-    def _clear_progress_lines(self):
+    def _clear_status_lines(self):
         self._clear_line(self.y_indicies['metadata'])
         self._clear_line(self.y_indicies['time'])
         self._clear_line(self.y_indicies['progress_bar'])
@@ -85,17 +90,24 @@ class View:
         self.screen.hline(middle_border, 1, curses.ACS_HLINE,
                           self.max_x_chars - 2)
 
-    def _draw_progress_info(self, metadata):
+    def _draw_progress_bar(self, metadata: dict):
         if metadata is None:
-            return
+            run_time = 0
+            curr_time = 0
+        else:
+            run_time = metadata["run_time"]
+            curr_time = metadata["curr_time"]
 
-        run_time = metadata["run_time"]
-        curr_time = metadata["curr_time"]
-
+        progress_bar_chars = self.max_x_chars - 2
         if run_time == 0:
-            return
+            percent = 0
+            fill_count = 0
+            void_count = progress_bar_chars
+        else:
+            percent = int((curr_time / run_time) * 100)
+            fill_count = int(progress_bar_chars * curr_time / run_time)
+            void_count = progress_bar_chars - fill_count
 
-        percent = int((curr_time / run_time) * 100)
         run_time_str = self._strfdelta(timedelta(seconds=run_time))
         curr_time_str = self._strfdelta(timedelta(seconds=curr_time))
         percent_str = ' (' + str(percent) + '%)'
@@ -103,10 +115,8 @@ class View:
         time_str += percent_str
 
         # two border characters
-        progress_bar_chars = self.max_x_chars - 2
-        fill_count = int(progress_bar_chars * curr_time / run_time)
-        progress_fill = cfg.prog_fill * fill_count
-        progress_void = ' ' * (progress_bar_chars - fill_count)
+        progress_fill = cfg.progress_bar_fill_char * fill_count
+        progress_void = cfg.progress_bar_empty_char * void_count
         progress_bar = progress_fill + progress_void
 
         self.screen.addstr(self.y_indicies['time'], 1, time_str)
@@ -144,7 +154,6 @@ class View:
         """add a string to the window; persistant until overwritten"""
         self._clear_line(self.y_indicies['status'])
         self.screen.addstr(self.y_indicies['status'], 1, string)
-        self.screen.refresh()
 
     def update_menu(self):
         """draw the top menu on the menu stack"""
@@ -158,37 +167,35 @@ class View:
         for list_index, item in enumerate(display_items, start=1):
             if list_index > self.num_menu_lines:
                 break
-            display_name = os.path.basename(item.path)
+            item_name = os.path.basename(item.path)
 
             if item.item_type is ItemType.Menu:
-                display_name = cfg.menu_icon + display_name
+                item_name = cfg.menu_icon + item_name
             elif item.item_type is ItemType.Directory:
-                display_name = cfg.dir_icon + display_name
+                item_name = cfg.dir_icon + item_name
             elif item.item_type is ItemType.Playlist:
-                display_name = cfg.playlist_icon + display_name
+                item_name = cfg.playlist_icon + item_name
             elif item.item_type is ItemType.Track:
-                display_name = cfg.track_icon + display_name
+                item_name = cfg.track_icon + item_name
 
             if display.index + 1 == list_index:
-                self.screen.addstr(list_index, 1, display_name, curses.A_REVERSE)
+                self.screen.addstr(list_index, 1, item_name, curses.A_REVERSE)
             else:
-                self.screen.addstr(list_index, 1, display_name)
+                self.screen.addstr(list_index, 1, item_name)
         self.menu_changed = False
 
     def update_status(self, metadata: dict):
-        """Update track metadata and progress indicators."""
+        """update track metadata and progress indicators."""
 
-        self._clear_progress_lines()
+        self._clear_status_lines()
         if metadata is None:
+            self.notify(cfg.no_load_str)
             self.screen.addstr(
                 self.y_indicies['metadata'], 1, cfg.no_media_str)
-            self.screen.addstr(
-                self.y_indicies['progress_bar'], 1, cfg.no_load_str)
             self.screen.addstr(self.y_indicies['time'], 1, cfg.no_load_str)
         else:
             title = metadata['title'][0]
             artist = metadata['artist'][0]
             song_info = title + cfg.song_sep_str + artist
             self.screen.addstr(self.y_indicies['metadata'], 1, song_info)
-            self._draw_progress_info(metadata)
-        self.screen.refresh()
+        self._draw_progress_bar(metadata)

@@ -1,7 +1,6 @@
 import os
 from time import sleep
 from enum import IntEnum
-from functools import partial
 from pynput.keyboard import Listener, KeyCode, Key
 
 import cfg
@@ -153,8 +152,10 @@ class Controller:
     def tick(self):
         """periodic ui update"""
         metadata = self.player.get_metadata()
-        self.view.update_status(metadata)
+        if metadata['playing'] is True:
+            self.view.update_status(metadata)
         self.view.update_menu()
+        self.view.screen.refresh()
 
     def run(self):
         """splits into two threads for ui and pynput"""
@@ -163,7 +164,7 @@ class Controller:
             listener.start()
             while listener.running:
                 self.tick()
-                # sleep(cfg.refresh_rate)
+                sleep(cfg.refresh_rate)
         finally:
             del self.view
             del self.player
