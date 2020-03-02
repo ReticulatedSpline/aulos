@@ -43,4 +43,5 @@ menu_icon = u'➤ '
 track_icon = u'♬ '
 playlist_icon = u'✎ '
 progress_bar_fill_char = u'▓'
-progress_bar_empty_char = u'░'
+progress_bar_empty_char = u'▒'
+

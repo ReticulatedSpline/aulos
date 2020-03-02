@@ -37,6 +37,15 @@ class Library:
                 items.append(DisplayItem(ItemType.Playlist, abs_path))
         return items
 
+    @staticmethod
+    def get_playlist_track_list(playlist_path: str) -> list:
+        """given a valid playlist path, return the list of track paths inside it"""
+        tracks = list()
+        with open(playlist_path, 'r') as playlist:
+            for line in playlist:
+                tracks.append(line)
+        return tracks
+
 
 class Player:
     """track player state and wrap calls to VLC"""
@@ -44,6 +53,7 @@ class Player:
     def __init__(self, library: Library):
         self.queue: list = library.music
         self.played: list = list()
+        self.library = library
         self.curr_track_path: str = self.queue[0]
         self.curr_track: MediaPlayer = vlc.MediaPlayer(self.curr_track_path)
         self.played.append(self.queue.pop())
@@ -71,11 +81,15 @@ class Player:
     def play(self, media=None):
         """play the passed track or track list"""
 
+        media_ext = os.path.splitext(media)[1]
+        if media_ext not in (cfg.music_formats + cfg.playlist_formats):
+            return
+
         if (len(self.queue) > 0):
             self.played.append(self.queue.pop())
 
-        if media is list:
-            self.queue.extend(media)
+        if media_ext in cfg.playlist_formats:
+            self.queue == self.library.get_playlist_tracks(media)
         elif os.path.isfile(media):
             self.queue.append(media)
         else:
@@ -89,8 +103,8 @@ class Player:
         if self.curr_track:
             self.curr_track.pause()
 
-    def enqueue(items: list):
-        self.queue = self.queue + items
+    def enqueue(self, items: list):
+        self.queue = self.queue.extend(items)
 
     def skip_forward(self):
         """skip the the beginning of the next track"""
@@ -101,14 +115,14 @@ class Player:
             return
         self.curr_track_path = song_path
         self.curr_track = vlc.MediaPlayer(song_path)
-        played.append(song_path)
+        self.played.append(song_path)
         self.play()
 
     def skip_back(self):
         """skip to the beginning of the last track"""
         if len(self.played) <= 1:
             return
-        song_path = last.pop()
+        song_path = self.played.pop()
         if not os.path.isfile(song_path):
             return
         self.curr_track_path = song_path
