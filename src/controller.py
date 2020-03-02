@@ -125,6 +125,14 @@ class Controller:
                         self.view.notify(cfg.play_error_str)
                     else:
                         self.view.notify(cfg.playing_str)
+            if ext in cfg.music_formats:
+                if item.path == cfg.media_option_items[MediaOptions.VIEW]:
+                    self.view.notify(cfg.not_implemented_str)
+                elif item.path == cfg.media_option_items[MediaOptions.PLAY]:
+                    if not self.player.play(display.menu_path):
+                        self.view.notify(cfg.play_error_str)
+                    else:
+                        self.view.notify(cfg.playing_str)
         elif item.item_type is ItemType.Directory:
             self.handle_dir_select(item.path, display)
         elif item.item_type in (ItemType.Track, ItemType.Playlist):
@@ -137,6 +145,7 @@ class Controller:
                 self.player.play()
             elif key.char == 'a':
                 self.player.pause()
+                self.view.notify(cfg.paused_str)
             elif key.char == 'n':
                 self.player.skip_forward()
             elif key.char == 'l':
