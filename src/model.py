@@ -3,7 +3,6 @@ import vlc
 from glob import glob
 from mutagen.easyid3 import EasyID3 as get_tags
 
-
 from display import DisplayItem, ItemType
 import cfg
 
@@ -70,13 +69,20 @@ class Player:
                 "run_time": run_time}
 
     def play(self, media=None):
-        """start playing the current or passed track"""
-        if not media:
-            return
+        """play the passed track or track list"""
+
+        if (len(self.queue) > 0):
+            self.played.append(self.queue.pop())
+
         if media is list:
             self.queue.extend(media)
-        self.curr_track = vlc.MediaPlayer(self.queue.pop())
-        self.curr_track.play()
+        elif os.path.isfile(media):
+            self.queue.append(media)
+        else:
+            return
+
+        self.curr_track = vlc.MediaPlayer(self.queue[0])
+        return True if self.curr_track.play() >= 0 else False
 
     def pause(self):
         """pause the current track, preserving position"""

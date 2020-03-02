@@ -13,6 +13,7 @@ playlist_formats = ('.m3u')
 no_load_str = "..."
 song_sep_str = " by "
 time_sep_str = " of "
+playing_str = "Now playing:"
 no_media_str = "Nothing playing."
 play_error_str = "Couldn't play file."
 not_implemented_str = "Not yet implemented!"

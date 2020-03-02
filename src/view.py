@@ -31,17 +31,14 @@ class View:
             'progress_bar': self.max_y_chars - 2
         }
 
-        # consume stdin as pynput is handling listening
-        self.save_stdin = sys.stdin
-        sys.stdin = open("last_session.log", 'w')
-        sys.stdin.truncate(0)
         self.update_menu()
         self.update_status(None)
 
     def __del__(self):
         """restore the previous state of the terminal"""
         curses.endwin()
-        sys.stdin = self.save_stdin
+        # cross-platform console clear
+        os.system('cls' if os.name == 'nt' else 'clear')
 
     @staticmethod
     def _strfdelta(tdelta: timedelta):

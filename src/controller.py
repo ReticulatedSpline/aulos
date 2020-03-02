@@ -40,6 +40,7 @@ class MediaOptions(IntEnum):
 
 class Controller:
     """handle menu transitions, and act as gobetween for model/view"""
+
     def __init__(self):
         self.view = View()
         self.library = Library()
@@ -120,8 +121,10 @@ class Controller:
                 if item.path == cfg.media_option_items[MediaOptions.VIEW]:
                     self.handle_playlist_select_view(display.menu_path)
                 if item.path == cfg.media_option_items[MediaOptions.PLAY]:
-                    if not self.player.play(item.path):
+                    if not self.player.play(display.menu_path):
                         self.view.notify(cfg.play_error_str)
+                    else:
+                        self.view.notify(cfg.playing_str)
         elif item.item_type is ItemType.Directory:
             self.handle_dir_select(item.path, display)
         elif item.item_type in (ItemType.Track, ItemType.Playlist):
