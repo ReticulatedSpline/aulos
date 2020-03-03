@@ -1,6 +1,7 @@
 import os
 import vlc
 from glob import glob
+from collections import deque
 from mutagen.easyid3 import EasyID3 as get_tags
 
 from display import DisplayItem, ItemType
@@ -11,8 +12,8 @@ class Library:
     """handle scanning and indexing media"""
 
     def __init__(self):
-        self.music = list()
-        self.last_played = list()
+        self.music = deque()
+        self.last_played = deque()
         for ext in cfg.music_formats:
             file = os.path.join(cfg.music_dir, '*' + ext)
             self.music.extend(glob(file))
@@ -38,7 +39,7 @@ class Library:
         return items
 
     @staticmethod
-    def get_playlist_track_list(playlist_path: str) -> list:
+    def get_playlist_tracks(playlist_path: str) -> list:
         """given a valid playlist path, return the list of track paths inside it"""
         tracks = list()
         with open(playlist_path, 'r') as playlist:
@@ -51,12 +52,11 @@ class Player:
     """track player state and wrap calls to VLC"""
 
     def __init__(self, library: Library):
-        self.queue: list = library.music
-        self.played: list = list()
+        self.next_tracks: deque = library.music
+        self.last_tracks: deque = deque()
         self.library = library
-        self.curr_track_path: str = self.queue[0]
-        self.curr_track: MediaPlayer = vlc.MediaPlayer(self.curr_track_path)
-        self.played.append(self.queue.pop())
+        self.curr_track: MediaPlayer = None
+        self.curr_track_path: str = None
 
     def get_metadata(self):
         """return a dictionary of current song's metadata"""
@@ -81,21 +81,19 @@ class Player:
     def play(self, media=None):
         """play the passed track or track list"""
 
+        track_list: list
         media_ext = os.path.splitext(media)[1]
-        if media_ext not in (cfg.music_formats + cfg.playlist_formats):
-            return
-
-        if (len(self.queue) > 0):
-            self.played.append(self.queue.pop())
-
-        if media_ext in cfg.playlist_formats:
-            self.queue == self.library.get_playlist_tracks(media)
-        elif os.path.isfile(media):
-            self.queue.append(media)
+        if os.path.isfile(media) and media_ext in cfg.playlist_formats:
+            track_list = self.library.get_playlist_tracks(media)
+        elif os.path.isfile(media) and media_ext in cfg.music_formats:
+            track_list = list(media)
         else:
             return
 
-        self.curr_track = vlc.MediaPlayer(self.queue[0])
+        self.next_tracks.appendleft(track_list)
+        up_next = self.next_tracks.popleft()
+        self.last_tracks.appendleft(up_next)
+        self.curr_track = vlc.MediaPlayer(up_next)
         return True if self.curr_track.play() >= 0 else False
 
     def pause(self):
@@ -104,28 +102,28 @@ class Player:
             self.curr_track.pause()
 
     def enqueue(self, items: list):
-        self.queue = self.queue.extend(items)
+        self.next_tracks = self.next_tracks.extend(items)
 
     def skip_forward(self):
         """skip the the beginning of the next track"""
-        if len(self.queue) <= 1:
+        if len(self.next_tracks) <= 1:
             return
-        song_path = self.queue.pop()
+        song_path = self.next_tracks.popleft()
         if not os.path.isfile(song_path):
             return
         self.curr_track_path = song_path
         self.curr_track = vlc.MediaPlayer(song_path)
-        self.played.append(song_path)
+        self.last_tracks.appendleft(song_path)
         self.play()
 
     def skip_back(self):
         """skip to the beginning of the last track"""
-        if len(self.played) <= 1:
+        if len(self.last_tracks) <= 1:
             return
-        song_path = self.played.pop()
+        song_path = self.last_tracks.popleft()
         if not os.path.isfile(song_path):
             return
         self.curr_track_path = song_path
         self.curr_track = vlc.MediaPlayer(song_path)
-        self.queue.append(song_path)
+        self.next_tracks.appendleft(song_path)
         self.play()

@@ -49,6 +49,7 @@ class Controller:
     def handle_song_select(self):
         display = self.view.menu_stack[-1]
         selected_item = display.get_selected_item()
+        index = selected_item.index
         if index == MediaOptions.PLAY_NOW:
             self.player.play(selected_item.path)
         elif index == MediaOptions.PLAY_NEXT:
@@ -110,6 +111,24 @@ class Controller:
             self.view.notify(cfg.not_implemented_str)
         return True
 
+    def handle_menu_select(self, item, ext, display):
+        if ext in cfg.playlist_formats:
+            if item.path == cfg.media_option_items[MediaOptions.VIEW]:
+                self.handle_playlist_select_view(display.menu_path)
+            if item.path == cfg.media_option_items[MediaOptions.PLAY]:
+                if not self.player.play(display.menu_path):
+                    self.view.notify(cfg.play_error_str)
+                else:
+                    self.view.notify(cfg.playing_str)
+        if ext in cfg.music_formats:
+            if item.path == cfg.media_option_items[MediaOptions.VIEW]:
+                self.view.notify(cfg.not_implemented_str)
+            elif item.path == cfg.media_option_items[MediaOptions.PLAY]:
+                if not self.player.play(display.menu_path):
+                    self.view.notify(cfg.play_error_str)
+                else:
+                    self.view.notify(cfg.playing_str)
+
     def handle_select(self):
         display: Display = self.view.menu_stack[-1]
         item: DisplayItem = display.get_selected_item()
@@ -117,22 +136,7 @@ class Controller:
         if not display.menu_path:
             return self.handle_home_select()
         elif item.item_type is ItemType.Menu:
-            if ext in cfg.playlist_formats:
-                if item.path == cfg.media_option_items[MediaOptions.VIEW]:
-                    self.handle_playlist_select_view(display.menu_path)
-                if item.path == cfg.media_option_items[MediaOptions.PLAY]:
-                    if not self.player.play(display.menu_path):
-                        self.view.notify(cfg.play_error_str)
-                    else:
-                        self.view.notify(cfg.playing_str)
-            if ext in cfg.music_formats:
-                if item.path == cfg.media_option_items[MediaOptions.VIEW]:
-                    self.view.notify(cfg.not_implemented_str)
-                elif item.path == cfg.media_option_items[MediaOptions.PLAY]:
-                    if not self.player.play(display.menu_path):
-                        self.view.notify(cfg.play_error_str)
-                    else:
-                        self.view.notify(cfg.playing_str)
+            self.handle_menu_select(item, ext, display)
         elif item.item_type is ItemType.Directory:
             self.handle_dir_select(item.path, display)
         elif item.item_type in (ItemType.Track, ItemType.Playlist):
@@ -164,7 +168,7 @@ class Controller:
     def tick(self):
         """periodic ui update"""
         metadata = self.player.get_metadata()
-        if metadata['playing'] is True:
+        if metadata and metadata['playing'] is True:
             self.view.update_status(metadata)
         self.view.update_menu()
         self.view.screen.refresh()
