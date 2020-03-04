@@ -68,6 +68,20 @@ class View:
         self._clear_line(self.y_indicies['time'])
         self._clear_line(self.y_indicies['progress_bar'])
 
+    def _truncate_string(self, string: str):
+        # two border chars and two box drawing chars
+        available_space = self.max_x_chars - 4
+        if len(string) < available_space:
+            return string
+        else:
+            string = os.path.basename(string)
+
+        str_len = len(string)
+        if str_len > available_space:
+            start = (str_len - available_space) + 3  # for ellipsis
+            string = '...' + string[start:]
+        return string
+
     def _draw_borders(self):
         self.screen.border(0)
         menu_path = self.menu_stack[-1].menu_path
@@ -75,6 +89,7 @@ class View:
             title = ' ' + cfg.home_icon + ' '
         else:
             title = ' ' + menu_path + ' '
+        title = self._truncate_string(title)
         title_pos = (self.max_x_chars - len(title)) // 2
         self.screen.addstr(0, title_pos, title)
         self.screen.addch(0, title_pos - 1, curses.ACS_RTEE)
@@ -165,7 +180,7 @@ class View:
             if list_index > self.num_menu_lines:
                 break
             item_name = os.path.basename(item.path)
-
+            item_name = self._truncate_string(item_name)
             if item.item_type is ItemType.Menu:
                 item_name = cfg.menu_icon + item_name
             elif item.item_type is ItemType.Directory:

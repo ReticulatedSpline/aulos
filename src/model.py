@@ -59,7 +59,7 @@ class Player:
         self.curr_track_path: str = None
 
     def __del__(self):
-        self.curr_track.stop()
+         self.stop()
 
     def get_metadata(self):
         """return a dictionary of current song's metadata"""
@@ -116,6 +116,11 @@ class Player:
         if self.curr_track:
             self.curr_track.pause()
 
+    def stop(self):
+        if self.curr_track:
+            self.curr_track.stop()
+            self.curr_track = None
+
     def enqueue(self, items: list):
         self.next_tracks = self.next_tracks.extend(items)
 
@@ -124,9 +129,7 @@ class Player:
         if len(self.next_tracks) <= 1:
             return
 
-        if self.curr_track:
-            self.curr_track.stop()
-            self.curr_track = None
+        self.stop()
 
         song_path = self.next_tracks.popleft()
         if not os.path.isfile(song_path):
@@ -141,9 +144,7 @@ class Player:
         if len(self.last_tracks) <= 1:
             return
 
-        if self.curr_track:
-            self.curr_track.stop()
-            self.curr_track = None
+        self.stop()
 
         song_path = self.last_tracks.popleft()
         if not os.path.isfile(song_path):
