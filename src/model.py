@@ -44,7 +44,7 @@ class Library:
         tracks = list()
         with open(playlist_path, 'r') as playlist:
             for line in playlist:
-                tracks.append(line)
+                tracks.append(line.rstrip())
         return tracks
 
 
@@ -52,8 +52,8 @@ class Player:
     """track player state and wrap calls to VLC"""
 
     def __init__(self, library: Library):
-        self.next_tracks: deque = library.music
-        self.last_tracks: deque = deque()
+        self.next_tracks = deque()
+        self.last_tracks = deque()
         self.library = library
         self.curr_track: MediaPlayer = None
         self.curr_track_path: str = None
@@ -79,7 +79,12 @@ class Player:
                 "run_time": run_time}
 
     def play(self, media=None):
-        """play the passed track or track list"""
+        """resume playback, or play the passed media"""
+
+        if media is None:
+            if self.curr_track is not None:
+              return True if self.curr_track.play() >= 0 else False
+            return False
 
         track_list: list
         media_ext = os.path.splitext(media)[1]
@@ -88,12 +93,14 @@ class Player:
         elif os.path.isfile(media) and media_ext in cfg.music_formats:
             track_list = list(media)
         else:
-            return
+            return False
 
-        self.next_tracks.appendleft(track_list)
+        self.next_tracks.clear()
+        self.next_tracks.extend(track_list)
         up_next = self.next_tracks.popleft()
         self.last_tracks.appendleft(up_next)
         self.curr_track = vlc.MediaPlayer(up_next)
+        self.curr_track_path = up_next
         return True if self.curr_track.play() >= 0 else False
 
     def pause(self):
