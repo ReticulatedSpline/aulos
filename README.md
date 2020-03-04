@@ -2,8 +2,6 @@
 A digital audio player designed for local media files, intended for the Raspberry Pi, and based on the venerable [VLC media player](https://en.wikipedia.org/wiki/VLC_media_player). OpenDAP is not tested on animals.
 
 ## Roadmap
-
-#### v1
 - [x] Play .mp3 and .flac audio files
 
 - [x] UI with current song and playback progress
@@ -17,13 +15,6 @@ A digital audio player designed for local media files, intended for the Raspberr
 - [ ] Queue functionality
 
 - [ ] Browse library by artist, album, genre, and year
-
-#### v2
-- [ ] Compatibility with the AdaFruit PiTFT touch display and/or hardware buttons
-
-- [ ] Investigate suitable batteries
-
-- [ ] Investigate suitable cases
 
 - [ ] Shuffling and looping
 
