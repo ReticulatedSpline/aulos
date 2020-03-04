@@ -46,8 +46,8 @@ OpenDAP is loosely based on the Model-View-Controller architecture. You'll find 
 **Model.py**: Code that handles disk I/O or uses the VLC library.
 
 ### Setup
-1. Install [VLC](https://www.videolan.org/vlc/) if you don't have it already.
-1. Install [Python 3+](https://www.python.org/) if you don't have it already, and then install pip dependencies:
+1. Install [VLC](https://www.videolan.org/vlc/).
+1. Install [Python 3+](https://www.python.org/), and then install pip dependencies:
 `pip3 install -r requirements.txt`
 1. If you're on MacOS, you'll need to grant your terminal emulator [permissions](https://support.apple.com/guide/mac-help/allow-accessibility-apps-to-access-your-mac-mh43185/mac) for the [pynput keyboard listener](https://pynput.readthedocs.io/en/latest/limitations.html#mac-osx) to work. This setting can be found under System Preferences ▶ Security and Privacy ▶ Accessibility. You may also need to run the process as root; I've had better luck with 3rd party emulators than the native Terminal.app.
 1. Optionally add some files to `./music` `./playlists`.
