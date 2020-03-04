@@ -26,7 +26,7 @@ A digital audio player designed for local media files, intended for the Raspberr
 
 - [ ] Display album art
 
-- [ ] Sync songs via WiFi and/or Bluetooth (with other openDAPs?)
+- [ ] Sync files over the air
 
 ## Recommended Hardware
 While running OpenDAP on the Raspberry Pi hardware is the long-term goal, note that openDAP *should* run on any terminal emulator.
