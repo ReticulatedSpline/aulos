@@ -3,6 +3,7 @@ A digital audio player designed for local media files, intended for the Raspberr
 
 ## Roadmap
 
+#### v1
 - [x] Play .mp3 and .flac audio files
 
 - [x] UI with current song and playback progress
@@ -17,6 +18,7 @@ A digital audio player designed for local media files, intended for the Raspberr
 
 - [ ] Browse library by artist, album, genre, and year
 
+#### v2
 - [ ] Compatibility with the AdaFruit PiTFT touch display and/or hardware buttons
 
 - [ ] Investigate suitable batteries
