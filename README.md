@@ -37,11 +37,11 @@ While running OpenDAP on the Raspberry Pi hardware is the long-term goal, note t
 
 ## Development
 ### Architecture
-OpenDAP is loosely based on the Model-View-Controller architecture. You'll find code split into one of three files:
+OpenDAP is loosely based on the Model-View-Controller architecture. You'll find most logic split into one of three files:
 
 **View.py**: Code that uses the Curses library or draws on the display.
 
-**Controller.py**: Logic determining which screen is drawn next and gathering user input.
+**Controller.py**: Logic determining which screen is drawn next, and gathering user input.
 
 **Model.py**: Code that handles disk I/O or uses the VLC library.
 
