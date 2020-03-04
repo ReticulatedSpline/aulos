@@ -147,6 +147,7 @@ class Controller:
         if hasattr(key, 'char'):
             if key.char == 'p':
                 self.player.play()
+                self.view.notify(cfg.playing_str)
             elif key.char == 'a':
                 self.player.pause()
                 self.view.notify(cfg.paused_str)

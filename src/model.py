@@ -58,13 +58,18 @@ class Player:
         self.curr_track: MediaPlayer = None
         self.curr_track_path: str = None
 
+    def __del__(self):
+        self.curr_track.stop()
+
     def get_metadata(self):
         """return a dictionary of current song's metadata"""
-        if not self.curr_track:
+        if self.curr_track is None:
             return None
+
         metadata = get_tags(self.curr_track_path)
         if not metadata:
-            return
+            return None
+
         curr_time = self.curr_track.get_time() / 1000   # time returned in ms
         if curr_time < 0:
             curr_time = 0
@@ -83,7 +88,10 @@ class Player:
 
         if media is None:
             if self.curr_track is not None:
-              return True if self.curr_track.play() >= 0 else False
+                if self.curr_track.is_playing():
+                    return True
+                else:
+                    return True if self.curr_track.play() >= 0 else False
             return False
 
         track_list: list
@@ -91,7 +99,7 @@ class Player:
         if os.path.isfile(media) and media_ext in cfg.playlist_formats:
             track_list = self.library.get_playlist_tracks(media)
         elif os.path.isfile(media) and media_ext in cfg.music_formats:
-            track_list = list(media)
+            track_list = [media]
         else:
             return False
 
@@ -115,6 +123,11 @@ class Player:
         """skip the the beginning of the next track"""
         if len(self.next_tracks) <= 1:
             return
+
+        if self.curr_track:
+            self.curr_track.stop()
+            self.curr_track = None
+
         song_path = self.next_tracks.popleft()
         if not os.path.isfile(song_path):
             return
@@ -127,6 +140,11 @@ class Player:
         """skip to the beginning of the last track"""
         if len(self.last_tracks) <= 1:
             return
+
+        if self.curr_track:
+            self.curr_track.stop()
+            self.curr_track = None
+
         song_path = self.last_tracks.popleft()
         if not os.path.isfile(song_path):
             return
