@@ -90,6 +90,14 @@ class Controller:
         new_display = Display(item_list, display_path)
         self.view.menu_stack.append(new_display)
 
+    def handle_queue_select(self):
+        display_path = cfg.home_menu_items[HomeOptions.QUEUE]
+        display_items = list()
+        for item in self.player.next_tracks:
+            display_items.append(DisplayItem(ItemType.Track, item))
+        new_display = Display(display_items, display_path)
+        self.view.menu_stack.append(new_display)
+
     def handle_home_select(self):
         display = self.view.menu_stack[-1]
         index = display.index + display.start_index
@@ -111,7 +119,7 @@ class Controller:
         elif index == HomeOptions.GENRES:
             self.view.notify(cfg.not_implemented_str)
         elif index == HomeOptions.QUEUE:
-            self.view.notify(cfg.not_implemented_str)
+            self.handle_queue_select()
         elif index == HomeOptions.SETTINGS:
             self.view.notify(cfg.not_implemented_str)
         return True

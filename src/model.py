@@ -140,11 +140,21 @@ class Player:
         if self.curr_track:
             self.curr_track.stop()
 
-    def play_next(self, items: list):
-        self.next_tracks.extendleft(items)
+    def play_next(self, item):
+        if item is None:
+            return
+        if item is list:
+            self.next_tracks.extendleft(item)
+        else:
+            self.next_tracks.appendleft(item)
 
-    def play_last(self, items: list):
-        self.next_tracks.extend(items)
+    def play_last(self, item):
+        if item is None:
+            return
+        if item is list:
+            self.next_tracks.extend(item)
+        else:
+            self.next_tracks.append(item)
 
     def skip_forward(self):
         """skip the the beginning of the next track"""

@@ -42,7 +42,7 @@ class View:
 
     @staticmethod
     def _strfdelta(tdelta: timedelta):
-        """Format a timedelta into a string"""
+        """format a timedelta into a string"""
         days = tdelta.days
         hours, rem = divmod(tdelta.seconds, 3600)
         minutes, seconds = divmod(rem, 60)
