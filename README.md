@@ -4,7 +4,7 @@ A digital audio player designed for local media files, intended for the Raspberr
 ## Roadmap
 - [x] Play .mp3 and .flac audio files
 
-- [x] UI with current song and playback progress
+- [x] UI with current track and playback progress
 
 - [x] Curses menu navigation
 

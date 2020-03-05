@@ -9,7 +9,7 @@ import cfg
 
 
 class Library:
-    """handle scanning and indexing media"""
+    """handle scanning and indexing media, mostly a placeholder for now"""
 
     def __init__(self):
         self.music = deque()
@@ -40,7 +40,7 @@ class Library:
 
     @staticmethod
     def get_playlist_tracks(playlist_path: str) -> list:
-        """given a valid playlist path, return the list of track paths inside it"""
+        """given a valid playlist path, return contained track paths as list"""
         tracks = list()
         with open(playlist_path, 'r') as playlist:
             for line in playlist:
@@ -59,10 +59,10 @@ class Player:
         self.curr_track_path: str = None
 
     def __del__(self):
-         self.stop()
+        self.stop()
 
     def get_metadata(self):
-        """return a dictionary of current song's metadata"""
+        """return a dictionary of current track's metadata"""
         if self.curr_track is None:
             return None
 
@@ -70,46 +70,66 @@ class Player:
         if not metadata:
             return None
 
-        curr_time = self.curr_track.get_time() / 1000   # time returned in ms
+        run_time = self.curr_track.get_length()
+        run_time = 0 if run_time < 0 else run_time / 1000   # millisec to sec
+        curr_time = self.curr_track.get_time() / 1000       # millisec to sec
         if curr_time < 0:
             curr_time = 0
-        run_time = self.curr_track.get_length()  # -1 indicates no media
-        run_time = 0 if run_time < 0 else run_time / 1000  # millisec to sec
-        playing = True if self.curr_track.is_playing() else False
-        return {"playing": playing,
-                "title": metadata['title'],
-                "artist": metadata['artist'],
-                "album": metadata['album'],
-                "curr_time": curr_time,
-                "run_time": run_time}
+        return {'playing': self.curr_track.is_playing(),
+                'title': metadata.get('title'),
+                'artist': metadata.get('artist'),
+                'album': metadata.get('album'),
+                'curr_time': curr_time,
+                'run_time': run_time}
 
-    def play(self, media=None):
-        """resume playback, or play the passed media"""
+    def restart_track(self):
+        self.curr_track.stop()
+        self.curr_track = vlc.MediaPlayer(self.curr_track_path)
+        self.play()
+
+    def play_current_track(self):
+        if self.curr_track is None:
+            return False
+        elif self.curr_track.is_playing() == 1:
+            return True
+        elif self.curr_track.play() >= 0:
+            return True
+        return False
+
+    def play_next_track(self):
+        if len(self.next_tracks) < 1:
+            return False
+        self.stop()
+        up_next = self.next_tracks.popleft()
+        self.last_tracks.appendleft(up_next)
+        self.curr_track = vlc.MediaPlayer(up_next)
+        self.curr_track_path = up_next
+        return self.curr_track.play() >= 0
+
+    def play(self, media=None) -> bool:
+        """resume playback, or play the passed media file"""
 
         if media is None:
-            if self.curr_track is not None:
-                if self.curr_track.is_playing():
-                    return True
-                else:
-                    return True if self.curr_track.play() >= 0 else False
+            return self.play_current_track()
+
+        if media == self.curr_track_path:
+            return True
+
+        if not os.path.isfile(media):
             return False
 
         track_list: list
         media_ext = os.path.splitext(media)[1]
-        if os.path.isfile(media) and media_ext in cfg.playlist_formats:
+        if media_ext in cfg.playlist_formats:
             track_list = self.library.get_playlist_tracks(media)
-        elif os.path.isfile(media) and media_ext in cfg.music_formats:
+        elif media_ext in cfg.music_formats:
             track_list = [media]
         else:
             return False
 
         self.next_tracks.clear()
         self.next_tracks.extend(track_list)
-        up_next = self.next_tracks.popleft()
-        self.last_tracks.appendleft(up_next)
-        self.curr_track = vlc.MediaPlayer(up_next)
-        self.curr_track_path = up_next
-        return True if self.curr_track.play() >= 0 else False
+        return self.play_next_track()
 
     def pause(self):
         """pause the current track, preserving position"""
@@ -119,10 +139,12 @@ class Player:
     def stop(self):
         if self.curr_track:
             self.curr_track.stop()
-            self.curr_track = None
 
-    def enqueue(self, items: list):
-        self.next_tracks = self.next_tracks.extend(items)
+    def play_next(self, items: list):
+        self.next_tracks.extendleft(items)
+
+    def play_last(self, items: list):
+        self.next_tracks.extend(items)
 
     def skip_forward(self):
         """skip the the beginning of the next track"""
@@ -131,25 +153,30 @@ class Player:
 
         self.stop()
 
-        song_path = self.next_tracks.popleft()
-        if not os.path.isfile(song_path):
+        track_path = self.next_tracks.popleft()
+        if not os.path.isfile(track_path):
             return
-        self.curr_track_path = song_path
-        self.curr_track = vlc.MediaPlayer(song_path)
-        self.last_tracks.appendleft(song_path)
+        self.curr_track_path = track_path
+        self.curr_track = vlc.MediaPlayer(track_path)
+        self.last_tracks.appendleft(track_path)
         self.play()
 
     def skip_back(self):
         """skip to the beginning of the last track"""
+        metadata = self.get_metadata()
+        if metadata:
+            if metadata['run_time'] <= cfg.skip_back_threshold:
+                self.restart_track()
+                return
+
         if len(self.last_tracks) <= 1:
             return
 
         self.stop()
-
-        song_path = self.last_tracks.popleft()
-        if not os.path.isfile(song_path):
+        track_path = self.last_tracks.popleft()
+        if not os.path.isfile(track_path):
             return
-        self.curr_track_path = song_path
-        self.curr_track = vlc.MediaPlayer(song_path)
-        self.next_tracks.appendleft(song_path)
+        self.curr_track_path = track_path
+        self.curr_track = vlc.MediaPlayer(track_path)
+        self.next_tracks.appendleft(track_path)
         self.play()

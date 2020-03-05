@@ -9,7 +9,7 @@ from view import View
 from model import Player, Library
 
 
-class Menu(IntEnum):
+class HomeOptions(IntEnum):
     """home menu options"""
     PLAYLISTS = 0
     ALBUMS = 1
@@ -21,21 +21,21 @@ class Menu(IntEnum):
     EXIT = 7
 
 
+class MediaOptions(IntEnum):
+    """menu options for playlists and tracks"""
+    PLAY = 0
+    VIEW = 1
+    QUEUE_NEXT = 2
+    QUEUE_LAST = 3
+    DELETE = 4
+
+
 class Direction(IntEnum):
     """navigational directions"""
     UP = 1
     DOWN = 2
     SELECT = 3
     BACK = 4
-
-
-class MediaOptions(IntEnum):
-    """options for playlists, library subsets, and single tracks"""
-    PLAY = 0
-    VIEW = 1
-    QUEUE_NEXT = 2
-    QUEUE_LAST = 3
-    DELETE = 4
 
 
 class Controller:
@@ -46,20 +46,25 @@ class Controller:
         self.library = Library()
         self.player = Player(self.library)
 
-    def handle_song_select(self):
+    def handle_track_select(self):
         display = self.view.menu_stack[-1]
         selected_item = display.get_selected_item()
-        index = selected_item.index
-        if index == MediaOptions.PLAY_NOW:
-            self.player.play(selected_item.path)
-        elif index == MediaOptions.PLAY_NEXT:
-            pass
-        elif index == MediaOptions.PLAY_LAST:
-            pass
-        elif index == MediaOptions.EDIT_TAGS:
-            pass
-        elif index == MediaOptions.DELETE_TRACK:
-            pass
+        path = selected_item.path
+        if path == cfg.media_option_items[MediaOptions.PLAY]:
+            self.player.play(display.menu_path)
+            self.view.menu_stack.pop()
+            self.view.notify(cfg.playing_str)
+        elif path == cfg.media_option_items[MediaOptions.QUEUE_NEXT]:
+            self.player.play_next(display.menu_path)
+            self.view.menu_stack.pop()
+            self.view.notify(cfg.play_next_str)
+        elif path == cfg.media_option_items[MediaOptions.QUEUE_LAST]:
+            self.player.play_last(display.menu_path)
+            self.view.menu_stack.pop()
+            self.view.notify(cfg.play_last_str)
+        elif path == cfg.media_option_items[MediaOptions.DELETE]:
+            self.view.menu_stack.pop()
+            self.view.notify(cfg.not_implemented_str)
 
     def handle_playlist_select_view(self, file_path: str):
         if not os.path.isfile(file_path):
@@ -88,46 +93,44 @@ class Controller:
     def handle_home_select(self):
         display = self.view.menu_stack[-1]
         index = display.index + display.start_index
-        if index == Menu.EXIT:
+        if index == HomeOptions.EXIT:
             return False
-        elif index == Menu.PLAYLISTS:
-            path = cfg.home_menu_items[Menu.PLAYLISTS]
+        elif index == HomeOptions.PLAYLISTS:
+            path = cfg.home_menu_items[HomeOptions.PLAYLISTS]
             items = self.library.get_disk_items(cfg.playlist_dir)
             display = Display(items, path)
             self.view.menu_stack.append(display)
-        elif index == Menu.TRACKS:
-            path = cfg.home_menu_items[Menu.TRACKS]
+        elif index == HomeOptions.TRACKS:
+            path = cfg.home_menu_items[HomeOptions.TRACKS]
             display = Display(self.library.get_tracks(), path)
             self.view.menu_stack.append(display)
-        elif index == Menu.ALBUMS:
+        elif index == HomeOptions.ALBUMS:
             self.view.notify(cfg.not_implemented_str)
-        elif index == Menu.ARTISTS:
+        elif index == HomeOptions.ARTISTS:
             self.view.notify(cfg.not_implemented_str)
-        elif index == Menu.GENRES:
+        elif index == HomeOptions.GENRES:
             self.view.notify(cfg.not_implemented_str)
-        elif index == Menu.QUEUE:
+        elif index == HomeOptions.QUEUE:
             self.view.notify(cfg.not_implemented_str)
-        elif index == Menu.SETTINGS:
+        elif index == HomeOptions.SETTINGS:
             self.view.notify(cfg.not_implemented_str)
         return True
 
+    def handle_playlist_select(self, item, ext, display):
+        if item.path == cfg.media_option_items[MediaOptions.VIEW]:
+            self.handle_playlist_select_view(display.menu_path)
+        if item.path == cfg.media_option_items[MediaOptions.PLAY]:
+            if not self.player.play(display.menu_path):
+                self.view.notify(cfg.play_error_str)
+            else:
+                self.view.notify(cfg.playing_str)
+            self.view.menu_stack.pop()
+
     def handle_menu_select(self, item, ext, display):
         if ext in cfg.playlist_formats:
-            if item.path == cfg.media_option_items[MediaOptions.VIEW]:
-                self.handle_playlist_select_view(display.menu_path)
-            if item.path == cfg.media_option_items[MediaOptions.PLAY]:
-                if not self.player.play(display.menu_path):
-                    self.view.notify(cfg.play_error_str)
-                else:
-                    self.view.notify(cfg.playing_str)
+            self.handle_playlist_select(item, ext, display)
         if ext in cfg.music_formats:
-            if item.path == cfg.media_option_items[MediaOptions.VIEW]:
-                self.view.notify(cfg.not_implemented_str)
-            elif item.path == cfg.media_option_items[MediaOptions.PLAY]:
-                if not self.player.play(display.menu_path):
-                    self.view.notify(cfg.play_error_str)
-                else:
-                    self.view.notify(cfg.playing_str)
+            self.handle_track_select()
 
     def handle_select(self):
         display: Display = self.view.menu_stack[-1]
@@ -169,8 +172,7 @@ class Controller:
     def tick(self):
         """periodic ui update"""
         metadata = self.player.get_metadata()
-        if metadata and metadata['playing'] is True:
-            self.view.update_status(metadata)
+        self.view.update_status(metadata)
         self.view.update_menu()
         self.view.screen.refresh()
 

@@ -107,8 +107,8 @@ class View:
             run_time = 0
             curr_time = 0
         else:
-            run_time = metadata["run_time"]
-            curr_time = metadata["curr_time"]
+            run_time = metadata.get('run_time')
+            curr_time = metadata.get('curr_time')
 
         progress_bar_chars = self.max_x_chars - 2
         if run_time == 0:
@@ -206,8 +206,8 @@ class View:
                 self.y_indicies['metadata'], 1, cfg.no_media_str)
             self.screen.addstr(self.y_indicies['time'], 1, cfg.no_load_str)
         else:
-            title = metadata['title'][0]
-            artist = metadata['artist'][0]
-            song_info = title + cfg.song_sep_str + artist
-            self.screen.addstr(self.y_indicies['metadata'], 1, song_info)
+            title = metadata.get('title')[0]
+            artist = metadata.get('artist')[0]
+            track_info = title + cfg.track_sep_str + artist
+            self.screen.addstr(self.y_indicies['metadata'], 1, track_info)
         self._draw_progress_bar(metadata)
