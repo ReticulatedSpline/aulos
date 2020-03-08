@@ -70,14 +70,14 @@ class Controller:
         if not os.path.isfile(file_path):
             return
         with open(file_path, 'r') as playlist:
-            tracks = list()
+            tracks = []
             for line in playlist:
                 tracks.append(DisplayItem(ItemType.Track, line.rstrip()))
         new_display = Display(tracks, file_path)
         self.view.menu_stack.append(new_display)
 
     def handle_media_select(self, item_path: str, display: Display):
-        items = list()
+        items = []
         for opt in cfg.media_option_items:
             items.append(DisplayItem(ItemType.Menu, opt))
         new_display = Display(items, item_path)
@@ -92,37 +92,11 @@ class Controller:
 
     def handle_queue_select(self):
         display_path = cfg.home_menu_items[HomeOptions.QUEUE]
-        display_items = list()
+        display_items = []
         for item in self.player.next_tracks:
             display_items.append(DisplayItem(ItemType.Track, item))
         new_display = Display(display_items, display_path)
         self.view.menu_stack.append(new_display)
-
-    def handle_home_select(self):
-        display = self.view.menu_stack[-1]
-        index = display.index + display.start_index
-        if index == HomeOptions.EXIT:
-            return False
-        elif index == HomeOptions.PLAYLISTS:
-            path = cfg.home_menu_items[HomeOptions.PLAYLISTS]
-            items = self.library.get_disk_items(cfg.playlist_dir)
-            display = Display(items, path)
-            self.view.menu_stack.append(display)
-        elif index == HomeOptions.TRACKS:
-            path = cfg.home_menu_items[HomeOptions.TRACKS]
-            display = Display(self.library.get_tracks(), path)
-            self.view.menu_stack.append(display)
-        elif index == HomeOptions.ALBUMS:
-            self.view.notify(cfg.not_implemented_str)
-        elif index == HomeOptions.ARTISTS:
-            self.view.notify(cfg.not_implemented_str)
-        elif index == HomeOptions.GENRES:
-            self.view.notify(cfg.not_implemented_str)
-        elif index == HomeOptions.QUEUE:
-            self.handle_queue_select()
-        elif index == HomeOptions.SETTINGS:
-            self.view.notify(cfg.not_implemented_str)
-        return True
 
     def handle_playlist_select(self, item, ext, display):
         if item.path == cfg.media_option_items[MediaOptions.VIEW]:
@@ -139,6 +113,56 @@ class Controller:
             self.handle_playlist_select(item, ext, display)
         if ext in cfg.music_formats:
             self.handle_track_select()
+
+    def handle_album_select(self):
+        path = cfg.home_menu_items[HomeOptions.ALBUMS]
+        display_items = []
+        for key in self.library.albums.keys():
+            display_items.append(DisplayItem(ItemType.Directory, key))
+        display = Display(display_items, path)
+        self.view.menu_stack.append(display)
+
+    def handle_artist_select(self):
+        path = cfg.home_menu_items[HomeOptions.ARTISTS]
+        display_items = []
+        for key in self.library.artists.keys():
+            display_items.append(DisplayItem(ItemType.Directory, key))
+        display = Display(display_items, path)
+        self.view.menu_stack.append(display)
+
+    def handle_genre_select(self):
+        path = cfg.home_menu_items[HomeOptions.GENRES]
+        display_items = []
+        for key in self.library.genres.keys():
+            display_items.append(DisplayItem(ItemType.Directory, key))
+        display = Display(display_items, path)
+        self.view.menu_stack.append(display)
+
+    def handle_home_select(self):
+        display = self.view.menu_stack[-1]
+        index = display.index + display.start_index
+        if index == HomeOptions.EXIT:
+            return False
+        elif index == HomeOptions.PLAYLISTS:
+            path = cfg.home_menu_items[HomeOptions.PLAYLISTS]
+            items = self.library.get_disk_items(cfg.playlist_dir)
+            display = Display(items, path)
+            self.view.menu_stack.append(display)
+        elif index == HomeOptions.TRACKS:
+            path = cfg.home_menu_items[HomeOptions.TRACKS]
+            display = Display(self.library.get_tracks(), path)
+            self.view.menu_stack.append(display)
+        elif index == HomeOptions.ALBUMS:
+            self.handle_album_select()
+        elif index == HomeOptions.ARTISTS:
+            self.handle_artist_select()
+        elif index == HomeOptions.GENRES:
+            self.handle_genre_select()
+        elif index == HomeOptions.QUEUE:
+            self.handle_queue_select()
+        elif index == HomeOptions.SETTINGS:
+            self.view.notify(cfg.not_implemented_str)
+        return True
 
     def handle_select(self):
         display: Display = self.view.menu_stack[-1]

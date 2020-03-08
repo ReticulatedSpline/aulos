@@ -1,7 +1,8 @@
 import os
 import vlc
 from glob import glob
-from collections import deque
+from typing import NoReturn
+from collections import deque, defaultdict
 from mutagen.easyid3 import EasyID3 as get_tags
 
 from display import DisplayItem, ItemType
@@ -9,17 +10,33 @@ import cfg
 
 
 class Library:
-    """handle scanning and indexing media, mostly a placeholder for now"""
+    """handle media. uses deques for fast manipulation from both sides"""
 
     def __init__(self):
-        self.music = deque()
+        self.tracks = deque()
         self.last_played = deque()
         for ext in cfg.music_formats:
             file = os.path.join(cfg.music_dir, '*' + ext)
-            self.music.extend(glob(file))
+            self.tracks.extend(glob(file))
+        # TODO: should these all be in a single dict for easier display work?
+        self.artists: list = self.get_metadata_dict('artist')
+        self.albums: list = self.get_metadata_dict('album')
+        self.years: list = self.get_metadata_dict('year')
+        self.genres: list = self.get_metadata_dict('genre')
+
+    def get_metadata_dict(self, key: str) -> dict:
+        results = defaultdict(list)
+        for track in self.tracks:
+            metadata = get_tags(track)
+            tag_list = metadata.get(key)
+            if not tag_list:
+                continue
+            for tag in tag_list:
+                results[tag].append(track)
+        return results
 
     def get_tracks(self):
-        return [DisplayItem(ItemType.Track, path) for path in self.music]
+        return [DisplayItem(ItemType.Track, path) for path in self.tracks]
 
     def get_disk_items(self, root: str):
         """return a tuple list of items, their paths, & their type"""
@@ -61,7 +78,7 @@ class Player:
     def __del__(self):
         self.stop()
 
-    def get_metadata(self):
+    def get_metadata(self) -> dict:
         """return a dictionary of current track's metadata"""
         if self.curr_track is None:
             return None
@@ -82,12 +99,12 @@ class Player:
                 'curr_time': curr_time,
                 'run_time': run_time}
 
-    def restart_track(self):
+    def restart_track(self) -> NoReturn:
         self.curr_track.stop()
         self.curr_track = vlc.MediaPlayer(self.curr_track_path)
         self.play()
 
-    def play_current_track(self):
+    def play_current_track(self) -> bool:
         if self.curr_track is None:
             return False
         elif self.curr_track.is_playing() == 1:
@@ -96,7 +113,7 @@ class Player:
             return True
         return False
 
-    def play_next_track(self):
+    def play_next_track(self) -> bool:
         if len(self.next_tracks) < 1:
             return False
         self.stop()
@@ -131,16 +148,16 @@ class Player:
         self.next_tracks.extend(track_list)
         return self.play_next_track()
 
-    def pause(self):
+    def pause(self) -> NoReturn:
         """pause the current track, preserving position"""
         if self.curr_track:
             self.curr_track.pause()
 
-    def stop(self):
+    def stop(self) -> NoReturn:
         if self.curr_track:
             self.curr_track.stop()
 
-    def play_next(self, item):
+    def play_next(self, item: str) -> NoReturn:
         if item is None:
             return
         if item is list:
@@ -148,7 +165,7 @@ class Player:
         else:
             self.next_tracks.appendleft(item)
 
-    def play_last(self, item):
+    def play_last(self, item: str) -> NoReturn:
         if item is None:
             return
         if item is list:
@@ -156,11 +173,10 @@ class Player:
         else:
             self.next_tracks.append(item)
 
-    def skip_forward(self):
+    def skip_forward(self) -> NoReturn:
         """skip the the beginning of the next track"""
         if len(self.next_tracks) <= 1:
             return
-
         self.stop()
 
         track_path = self.next_tracks.popleft()
@@ -171,7 +187,7 @@ class Player:
         self.last_tracks.appendleft(track_path)
         self.play()
 
-    def skip_back(self):
+    def skip_back(self) -> NoReturn:
         """skip to the beginning of the last track"""
         metadata = self.get_metadata()
         if metadata:
