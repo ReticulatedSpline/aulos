@@ -1,6 +1,7 @@
 import os
 from time import sleep
 from enum import IntEnum
+from typing import NoReturn
 from pynput.keyboard import Listener, KeyCode, Key
 
 import cfg
@@ -114,6 +115,28 @@ class Controller:
         if ext in cfg.music_formats:
             self.handle_track_select()
 
+    def handle_lib_subset(self) -> NoReturn:
+        curr_display = self.view.menu_stack[-1]
+        menu_path = curr_display.menu_path
+        key = curr_display.get_selected_item().path
+        if cfg.home_menu_items[HomeOptions.ALBUMS] in menu_path:
+            key_items = self.library.albums.get(key)
+        elif cfg.home_menu_items[HomeOptions.ARTISTS] in menu_path:
+            key_items = self.library.artists.get(key)
+        elif cfg.home_menu_items[HomeOptions.GENRES] in menu_path:
+            key_items = self.library.genres.get(key)
+
+        if not key_items:
+            self.view.notify(cfg.load_error_str)
+            return
+        else:
+            new_item_list = []
+            for item in key_items:
+                new_item_list.append(DisplayItem(ItemType.Track, item))
+            new_path = os.path.join(curr_display.menu_path, key)
+            new_display = Display(new_item_list, new_path)
+        self.view.menu_stack.append(new_display)
+
     def handle_album_select(self):
         path = cfg.home_menu_items[HomeOptions.ALBUMS]
         display_items = []
@@ -168,8 +191,11 @@ class Controller:
         display: Display = self.view.menu_stack[-1]
         item: DisplayItem = display.get_selected_item()
         ext: str = os.path.splitext(display.menu_path)[1]
+        lib_subsets = cfg.home_menu_items[HomeOptions.ALBUMS:HomeOptions.GENRES]
         if not display.menu_path:
             return self.handle_home_select()
+        elif display.menu_path in lib_subsets:
+            self.handle_lib_subset()
         elif item.item_type is ItemType.Menu:
             self.handle_menu_select(item, ext, display)
         elif item.item_type is ItemType.Directory:

@@ -12,13 +12,17 @@ A digital audio player designed for local media files, intended for the Raspberr
 
 - [x] Browse library by playlist
 
-- [ ] Queue functionality
+- [x] Queue functionality
 
-- [ ] Browse library by artist, album, genre, and year
+- [x] Browse library by artist, album, genre, and year
+
+- [ ] Reorderable queue
 
 - [ ] Shuffling and looping
 
 - [ ] Quick scrolling
+
+- [ ] Caching
 
 - [ ] Ability to view/edit ID3 tags
 

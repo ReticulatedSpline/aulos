@@ -23,6 +23,7 @@ play_next_str = "Queued next."
 play_last_str = "Queued last."
 no_media_str = "Nothing playing."
 play_error_str = "Couldn't play file."
+load_error_str = "Unable to complete request."
 not_implemented_str = "Not yet implemented!"
 home_menu_items = [
     "playlists",
