@@ -2,6 +2,7 @@
 import os
 import sys
 import curses
+from typing import NoReturn
 from datetime import timedelta
 
 from display import Display, DisplayItem, ItemType
@@ -41,7 +42,7 @@ class View:
         os.system('cls' if os.name == 'nt' else 'clear')
 
     @staticmethod
-    def _strfdelta(tdelta: timedelta):
+    def _strfdelta(tdelta: timedelta) -> str:
         """format a timedelta into a string"""
         days = tdelta.days
         hours, rem = divmod(tdelta.seconds, 3600)
@@ -54,21 +55,21 @@ class View:
             time_str += str(hours) + ' hours '
         return time_str
 
-    def _clear_line(self, line: int):
+    def _clear_line(self, line: int) -> NoReturn:
         self.screen.move(line, 1)
         self.screen.clrtoeol()
         self._draw_borders()
 
-    def _clear_menu_lines(self):
+    def _clear_menu_lines(self) -> NoReturn:
         for line in list(range(1, self.num_menu_lines + 1)):
             self._clear_line(line)
 
-    def _clear_status_lines(self):
+    def _clear_status_lines(self) -> NoReturn:
         self._clear_line(self.y_indicies['metadata'])
         self._clear_line(self.y_indicies['time'])
         self._clear_line(self.y_indicies['progress_bar'])
 
-    def _truncate_string(self, string: str):
+    def _truncate_string(self, string: str) -> str:
         # two border chars and two box drawing chars
         available_space = self.max_x_chars - 4
         if len(string) < available_space:
@@ -82,7 +83,7 @@ class View:
             string = '...' + string[start:]
         return string
 
-    def _draw_borders(self):
+    def _draw_borders(self) -> NoReturn:
         self.screen.border(0)
         menu_path = self.menu_stack[-1].menu_path
         if not menu_path:
@@ -102,7 +103,7 @@ class View:
         self.screen.hline(middle_border, 1, curses.ACS_HLINE,
                           self.max_x_chars - 2)
 
-    def _draw_progress_bar(self, metadata: dict):
+    def _draw_progress_bar(self, metadata: dict) -> NoReturn:
         if metadata is None:
             run_time = 0
             curr_time = 0
@@ -134,7 +135,13 @@ class View:
         self.screen.addstr(self.y_indicies['time'], 1, time_str)
         self.screen.addstr(self.y_indicies['progress_bar'], 1, progress_bar)
 
-    def navigate_up(self):
+    def draw_empty_str(self):
+        """denote an empty collection of display items"""
+        y_pos = int(self.y_indicies['status'] - 1)
+        x_pos = int(self.max_x_chars / 2)
+        self.screen.addstr(y_pos, x_pos, cfg.empty_str)
+
+    def navigate_up(self) -> NoReturn:
         display = self.menu_stack[-1]
         if display.start_index + display.index > 0:
             self.menu_stack.pop()
@@ -148,7 +155,7 @@ class View:
             display = display._replace(index=index, start_index=start_index)
             self.menu_stack.append(display)
 
-    def navigate_down(self):
+    def navigate_down(self) -> NoReturn:
         display = self.menu_stack[-1]
         if display.start_index + display.index < len(display.items) - 1:
             display = self.menu_stack.pop()
@@ -158,16 +165,16 @@ class View:
                 display = display._replace(index=0, start_index=start_index)
         self.menu_stack.append(display)
 
-    def navigate_back(self):
+    def navigate_back(self) -> NoReturn:
         if len(self.menu_stack) > 1:
             self.menu_stack.pop()
 
-    def notify(self, string: str):
+    def notify(self, string: str) -> NoReturn:
         """add a string to the window; persistant until overwritten"""
         self._clear_line(self.y_indicies['status'])
         self.screen.addstr(self.y_indicies['status'], 1, string)
 
-    def update_menu(self):
+    def update_menu(self) -> NoReturn:
         """draw the top menu on the menu stack"""
         self._clear_menu_lines()
         display = self.menu_stack[-1]
@@ -176,27 +183,29 @@ class View:
             return
 
         display_items = display.items[display.start_index:]
-        for list_index, item in enumerate(display_items, start=1):
-            if list_index > self.num_menu_lines:
-                break
-            item_name = os.path.basename(item.path)
-            item_name = self._truncate_string(item_name)
-            if item.item_type is ItemType.Menu:
-                item_name = cfg.menu_icon + item_name
-            elif item.item_type is ItemType.Directory:
-                item_name = cfg.dir_icon + item_name
-            elif item.item_type is ItemType.Playlist:
-                item_name = cfg.playlist_icon + item_name
-            elif item.item_type is ItemType.Track:
-                item_name = cfg.track_icon + item_name
+        if len(display_items) <= 1:
+            self.draw_empty_str()
+        else:
+            for list_index, item in enumerate(display_items, start=1):
+                if list_index > self.num_menu_lines:
+                    break
+                item_name = os.path.basename(item.path)
+                item_name = self._truncate_string(item_name)
+                if item.item_type is ItemType.Menu:
+                    item_name = cfg.menu_icon + item_name
+                elif item.item_type is ItemType.Directory:
+                    item_name = cfg.dir_icon + item_name
+                elif item.item_type is ItemType.Playlist:
+                    item_name = cfg.playlist_icon + item_name
+                elif item.item_type is ItemType.Track:
+                    item_name = cfg.track_icon + item_name
 
-            if display.index + 1 == list_index:
-                self.screen.addstr(list_index, 1, item_name, curses.A_REVERSE)
-            else:
-                self.screen.addstr(list_index, 1, item_name)
-        self.menu_changed = False
+                if display.index + 1 == list_index:
+                    self.screen.addstr(list_index, 1, item_name, curses.A_REVERSE)
+                else:
+                    self.screen.addstr(list_index, 1, item_name)
 
-    def update_status(self, metadata: dict):
+    def update_status(self, metadata: dict) -> NoReturn:
         """update track metadata and progress indicators."""
 
         self._clear_status_lines()

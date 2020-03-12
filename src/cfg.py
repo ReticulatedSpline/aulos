@@ -15,6 +15,7 @@ playlist_formats = ('.m3u')
 
 # text strings
 no_load_str = "..."
+empty_str = "<empty>"
 time_sep_str = " of "
 track_sep_str = " by "
 paused_str = "Paused."

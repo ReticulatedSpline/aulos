@@ -47,7 +47,12 @@ class Controller:
         self.library = Library()
         self.player = Player(self.library)
 
-    def handle_track_select(self):
+    def update_queue(self):
+        display = self.view.menu_stack[-1]
+        if display.menu_path == cfg.home_menu_items[HomeOptions.QUEUE]:
+            self.handle_queue_select()
+
+    def handle_track_select(self) -> NoReturn:
         display = self.view.menu_stack[-1]
         selected_item = display.get_selected_item()
         path = selected_item.path
@@ -67,7 +72,7 @@ class Controller:
             self.view.menu_stack.pop()
             self.view.notify(cfg.not_implemented_str)
 
-    def handle_playlist_select_view(self, file_path: str):
+    def handle_playlist_select_view(self, file_path: str) -> NoReturn:
         if not os.path.isfile(file_path):
             return
         with open(file_path, 'r') as playlist:
@@ -77,21 +82,21 @@ class Controller:
         new_display = Display(tracks, file_path)
         self.view.menu_stack.append(new_display)
 
-    def handle_media_select(self, item_path: str, display: Display):
+    def handle_media_select(self, item_path: str, display: Display) -> NoReturn:
         items = []
         for opt in cfg.media_option_items:
             items.append(DisplayItem(ItemType.Menu, opt))
         new_display = Display(items, item_path)
         self.view.menu_stack.append(new_display)
 
-    def handle_dir_select(self, item_path: str, display):
+    def handle_dir_select(self, item_path: str, display) -> NoReturn:
         item_name = item_path.split(os.sep)[-1]
         display_path = display.menu_path + os.sep + item_name
         item_list = self.library.get_disk_items(item_path)
         new_display = Display(item_list, display_path)
         self.view.menu_stack.append(new_display)
 
-    def handle_queue_select(self):
+    def handle_queue_select(self) -> NoReturn:
         display_path = cfg.home_menu_items[HomeOptions.QUEUE]
         display_items = []
         for item in self.player.next_tracks:
@@ -99,7 +104,7 @@ class Controller:
         new_display = Display(display_items, display_path)
         self.view.menu_stack.append(new_display)
 
-    def handle_playlist_select(self, item, ext, display):
+    def handle_playlist_select(self, item, ext, display) -> NoReturn:
         if item.path == cfg.media_option_items[MediaOptions.VIEW]:
             self.handle_playlist_select_view(display.menu_path)
         if item.path == cfg.media_option_items[MediaOptions.PLAY]:
@@ -109,7 +114,7 @@ class Controller:
                 self.view.notify(cfg.playing_str)
             self.view.menu_stack.pop()
 
-    def handle_menu_select(self, item, ext, display):
+    def handle_menu_select(self, item, ext, display) -> NoReturn:
         if ext in cfg.playlist_formats:
             self.handle_playlist_select(item, ext, display)
         if ext in cfg.music_formats:
@@ -137,7 +142,7 @@ class Controller:
             new_display = Display(new_item_list, new_path)
         self.view.menu_stack.append(new_display)
 
-    def handle_album_select(self):
+    def handle_album_select(self) -> NoReturn:
         path = cfg.home_menu_items[HomeOptions.ALBUMS]
         display_items = []
         for key in self.library.albums.keys():
@@ -145,7 +150,7 @@ class Controller:
         display = Display(display_items, path)
         self.view.menu_stack.append(display)
 
-    def handle_artist_select(self):
+    def handle_artist_select(self) -> NoReturn:
         path = cfg.home_menu_items[HomeOptions.ARTISTS]
         display_items = []
         for key in self.library.artists.keys():
@@ -153,7 +158,7 @@ class Controller:
         display = Display(display_items, path)
         self.view.menu_stack.append(display)
 
-    def handle_genre_select(self):
+    def handle_genre_select(self) -> NoReturn:
         path = cfg.home_menu_items[HomeOptions.GENRES]
         display_items = []
         for key in self.library.genres.keys():
@@ -161,7 +166,7 @@ class Controller:
         display = Display(display_items, path)
         self.view.menu_stack.append(display)
 
-    def handle_home_select(self):
+    def handle_home_select(self) -> NoReturn:
         display = self.view.menu_stack[-1]
         index = display.index + display.start_index
         if index == HomeOptions.EXIT:
@@ -187,7 +192,7 @@ class Controller:
             self.view.notify(cfg.not_implemented_str)
         return True
 
-    def handle_select(self):
+    def handle_select(self) -> NoReturn:
         display: Display = self.view.menu_stack[-1]
         item: DisplayItem = display.get_selected_item()
         ext: str = os.path.splitext(display.menu_path)[1]
@@ -230,6 +235,7 @@ class Controller:
     def tick(self):
         """periodic ui update"""
         metadata = self.player.get_metadata()
+        self.update_queue()
         self.view.update_status(metadata)
         self.view.update_menu()
         self.view.screen.refresh()

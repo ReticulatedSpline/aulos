@@ -19,10 +19,10 @@ class Library:
             file = os.path.join(cfg.music_dir, '*' + ext)
             self.tracks.extend(glob(file))
         # TODO: should these all be in a single dict for easier display work?
-        self.artists: list = self.get_metadata_dict('artist')
-        self.albums: list = self.get_metadata_dict('album')
-        self.years: list = self.get_metadata_dict('year')
-        self.genres: list = self.get_metadata_dict('genre')
+        self.artists: dict = self.get_metadata_dict('artist')
+        self.albums: dict = self.get_metadata_dict('album')
+        self.years: dict = self.get_metadata_dict('year')
+        self.genres: dict = self.get_metadata_dict('genre')
 
     def get_metadata_dict(self, key: str) -> dict:
         results = defaultdict(list)
@@ -35,10 +35,10 @@ class Library:
                 results[tag].append(track)
         return results
 
-    def get_tracks(self):
+    def get_tracks(self) -> list:
         return [DisplayItem(ItemType.Track, path) for path in self.tracks]
 
-    def get_disk_items(self, root: str):
+    def get_disk_items(self, root: str) -> list:
         """return a tuple list of items, their paths, & their type"""
         items = list()
 
