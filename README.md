@@ -24,9 +24,9 @@ A digital audio player designed for local media files, intended for the Raspberr
 
 - [ ] Caching
 
-- [ ] Ability to view/edit ID3 tags
-
 - [ ] Ability to edit .m3u playlists
+
+- [ ] Ability to view/edit ID3 tags
 
 - [ ] Display album art
 
