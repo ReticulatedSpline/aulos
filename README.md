@@ -45,6 +45,6 @@ While running OpenDAP on the Raspberry Pi hardware is the long-term goal, note t
 1. Install [VLC](https://www.videolan.org/vlc/).
 1. Install [Python 3+](https://www.python.org/), and then install pip dependencies:
 `pip3 install -r requirements.txt`
-1. If you're on MacOS, you'll need to grant your terminal emulator [permissions](https://support.apple.com/guide/mac-help/allow-accessibility-apps-to-access-your-mac-mh43185/mac) for the [pynput keyboard listener](https://pynput.readthedocs.io/en/latest/limitations.html#mac-osx) to work. This setting can be found under System Preferences ▶ Security and Privacy ▶ Accessibility. You may also need to run the process as root; I've had better luck with 3rd party emulators than the native Terminal.app.
+1. If you're on MacOS, you'll need to grant your terminal emulator [permissions](https://support.apple.com/guide/mac-help/allow-accessibility-apps-to-access-your-mac-mh43185/mac) for the [pynput keyboard listener](https://pynput.readthedocs.io/en/latest/limitations.html#mac-osx) to work. This setting can be found under System Preferences → Security and Privacy → Accessibility. You may also need to run the process as root; I've had better luck with 3rd party emulators than the native Terminal.app.
 1. Optionally add some files to `./music` `./playlists`.
 1. Run `python3 src/main.py`.
