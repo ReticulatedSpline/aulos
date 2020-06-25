@@ -113,7 +113,7 @@ class Player:
         return False
 
     def play_next_track(self) -> bool:
-        if len(self.next_tracks) < 1:
+        if len(self.next_tracks) <= 0:
             return False
         self.stop()
         up_next = self.next_tracks.popleft()
@@ -174,7 +174,7 @@ class Player:
 
     def skip_forward(self):
         """skip the the beginning of the next track"""
-        if len(self.next_tracks) <= 1:
+        if len(self.next_tracks) <= 0:
             return
         self.stop()
 

@@ -181,7 +181,7 @@ class View:
             return
 
         display_items = display.items[display.start_index:]
-        if len(display_items) <= 1:
+        if len(display_items) <= 0:
             self.draw_empty_str()
         else:
             for list_index, item in enumerate(display_items, start=1):

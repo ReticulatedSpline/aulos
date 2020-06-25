@@ -233,6 +233,10 @@ class Controller:
     def tick(self):
         """periodic ui update"""
         metadata = self.player.get_metadata()
+        display = self.view.menu_stack[-1]
+        if display.menu_path == cfg.home_menu_items[HomeOptions.QUEUE]:
+            self.view.menu_stack.pop()
+            self.handle_queue_select()
         self.view.update_status(metadata)
         self.view.update_menu()
         self.view.screen.refresh()
