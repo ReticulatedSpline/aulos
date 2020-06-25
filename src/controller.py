@@ -47,11 +47,6 @@ class Controller:
         self.library = Library()
         self.player = Player(self.library)
 
-    def update_queue(self):
-        display = self.view.menu_stack[-1]
-        if display.menu_path == cfg.home_menu_items[HomeOptions.QUEUE]:
-            self.handle_queue_select()
-
     def handle_track_select(self) -> NoReturn:
         display = self.view.menu_stack[-1]
         selected_item = display.get_selected_item()
@@ -239,7 +234,6 @@ class Controller:
     def tick(self):
         """periodic ui update"""
         metadata = self.player.get_metadata()
-        self.update_queue()
         self.view.update_status(metadata)
         self.view.update_menu()
         self.view.screen.refresh()
