@@ -70,7 +70,7 @@ class View:
         self._clear_line(self.y_indicies['progress_bar'])
 
     def _truncate_string(self, string: str) -> str:
-        # two border chars and two box drawing chars
+        # four from two border chars and two box drawing chars
         available_space = self.max_x_chars - 4
         if len(string) < available_space:
             return string
@@ -79,7 +79,7 @@ class View:
 
         str_len = len(string)
         if str_len > available_space:
-            start = (str_len - available_space) + 3  # for ellipsis
+            start = (str_len - available_space) + 3  # three for ellipsis
             string = '...' + string[start:]
         return string
 
@@ -163,7 +163,7 @@ class View:
             if display.index >= self.num_menu_lines:
                 start_index = display.start_index + self.num_menu_lines
                 display = display._replace(index=0, start_index=start_index)
-        self.menu_stack.append(display)
+            self.menu_stack.append(display)
 
     def navigate_back(self) -> NoReturn:
         if len(self.menu_stack) > 1:
