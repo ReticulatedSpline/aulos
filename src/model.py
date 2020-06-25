@@ -1,7 +1,6 @@
 import os
 import vlc
 from glob import glob
-from typing import NoReturn
 from collections import deque, defaultdict
 from mutagen.easyid3 import EasyID3 as get_tags
 
@@ -99,7 +98,7 @@ class Player:
                 'curr_time': curr_time,
                 'run_time': run_time}
 
-    def restart_track(self) -> NoReturn:
+    def restart_track(self):
         self.curr_track.stop()
         self.curr_track = vlc.MediaPlayer(self.curr_track_path)
         self.play()
@@ -148,16 +147,16 @@ class Player:
         self.next_tracks.extend(track_list)
         return self.play_next_track()
 
-    def pause(self) -> NoReturn:
+    def pause(self):
         """pause the current track, preserving position"""
         if self.curr_track:
             self.curr_track.pause()
 
-    def stop(self) -> NoReturn:
+    def stop(self):
         if self.curr_track:
             self.curr_track.stop()
 
-    def play_next(self, item: str) -> NoReturn:
+    def play_next(self, item: str):
         if item is None:
             return
         if item is list:
@@ -165,7 +164,7 @@ class Player:
         else:
             self.next_tracks.appendleft(item)
 
-    def play_last(self, item: str) -> NoReturn:
+    def play_last(self, item: str):
         if item is None:
             return
         if item is list:
@@ -173,7 +172,7 @@ class Player:
         else:
             self.next_tracks.append(item)
 
-    def skip_forward(self) -> NoReturn:
+    def skip_forward(self):
         """skip the the beginning of the next track"""
         if len(self.next_tracks) <= 1:
             return
@@ -187,7 +186,7 @@ class Player:
         self.last_tracks.appendleft(track_path)
         self.play()
 
-    def skip_back(self) -> NoReturn:
+    def skip_back(self):
         """skip to the beginning of the last track"""
         metadata = self.get_metadata()
         if metadata:

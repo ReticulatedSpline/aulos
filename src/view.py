@@ -2,7 +2,6 @@
 import os
 import sys
 import curses
-from typing import NoReturn
 from datetime import timedelta
 
 from display import Display, DisplayItem, ItemType
@@ -55,16 +54,16 @@ class View:
             time_str += str(hours) + ' hours '
         return time_str
 
-    def _clear_line(self, line: int) -> NoReturn:
+    def _clear_line(self, line: int):
         self.screen.move(line, 1)
         self.screen.clrtoeol()
         self._draw_borders()
 
-    def _clear_menu_lines(self) -> NoReturn:
+    def _clear_menu_lines(self):
         for line in list(range(1, self.num_menu_lines + 1)):
             self._clear_line(line)
 
-    def _clear_status_lines(self) -> NoReturn:
+    def _clear_status_lines(self):
         self._clear_line(self.y_indicies['metadata'])
         self._clear_line(self.y_indicies['time'])
         self._clear_line(self.y_indicies['progress_bar'])
@@ -83,7 +82,7 @@ class View:
             string = '...' + string[start:]
         return string
 
-    def _draw_borders(self) -> NoReturn:
+    def _draw_borders(self):
         self.screen.border(0)
         menu_path = self.menu_stack[-1].menu_path
         if not menu_path:
@@ -103,7 +102,7 @@ class View:
         self.screen.hline(middle_border, 1, curses.ACS_HLINE,
                           self.max_x_chars - 2)
 
-    def _draw_progress_bar(self, metadata: dict) -> NoReturn:
+    def _draw_progress_bar(self, metadata: dict):
         if metadata is None:
             run_time = 0
             curr_time = 0
@@ -139,7 +138,7 @@ class View:
         """denote an empty collection of display items"""
         self.screen.addstr(1, 1, cfg.empty_str)
 
-    def navigate_up(self) -> NoReturn:
+    def navigate_up(self):
         display = self.menu_stack[-1]
         if display.start_index + display.index > 0:
             self.menu_stack.pop()
@@ -153,7 +152,7 @@ class View:
             display = display._replace(index=index, start_index=start_index)
             self.menu_stack.append(display)
 
-    def navigate_down(self) -> NoReturn:
+    def navigate_down(self):
         display = self.menu_stack[-1]
         if display.start_index + display.index < len(display.items) - 1:
             display = self.menu_stack.pop()
@@ -163,16 +162,16 @@ class View:
                 display = display._replace(index=0, start_index=start_index)
             self.menu_stack.append(display)
 
-    def navigate_back(self) -> NoReturn:
+    def navigate_back(self):
         if len(self.menu_stack) > 1:
             self.menu_stack.pop()
 
-    def notify(self, string: str) -> NoReturn:
+    def notify(self, string: str):
         """add a string to the window; persistant until overwritten"""
         self._clear_line(self.y_indicies['status'])
         self.screen.addstr(self.y_indicies['status'], 1, string)
 
-    def update_menu(self) -> NoReturn:
+    def update_menu(self):
         """draw the top menu on the menu stack"""
         self._clear_menu_lines()
         display = self.menu_stack[-1]
@@ -204,7 +203,7 @@ class View:
                 else:
                     self.screen.addstr(list_index, 1, item_name)
 
-    def update_status(self, metadata: dict) -> NoReturn:
+    def update_status(self, metadata: dict):
         """update track metadata and progress indicators."""
 
         self._clear_status_lines()

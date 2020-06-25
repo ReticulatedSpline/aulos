@@ -1,4 +1,3 @@
-from typing import NoReturn
 from controller import Controller
 
 
