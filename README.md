@@ -16,6 +16,8 @@ Digital audio player designed for local media files, intended for the Raspberry 
 
 - [x] Browse library by artist, album, genre, and year
 
+- [ ] View recently played tracks
+
 - [ ] Reorderable queue
 
 - [ ] Shuffling and looping
