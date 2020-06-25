@@ -82,7 +82,7 @@ class Controller:
         new_display = Display(tracks, file_path)
         self.view.menu_stack.append(new_display)
 
-    def handle_media_select(self, item_path: str, display: Display) -> NoReturn:
+    def handle_media_select(self, item_path: str, display: Display):
         items = []
         for opt in cfg.media_option_items:
             items.append(DisplayItem(ItemType.Menu, opt))
@@ -195,6 +195,9 @@ class Controller:
     def handle_select(self) -> NoReturn:
         display: Display = self.view.menu_stack[-1]
         item: DisplayItem = display.get_selected_item()
+        if item is None:
+            return
+
         ext: str = os.path.splitext(display.menu_path)[1]
         lib_subsets = cfg.home_menu_items[HomeOptions.ALBUMS:HomeOptions.GENRES]
         if not display.menu_path:
@@ -223,14 +226,15 @@ class Controller:
                 self.player.skip_back()
             return True
         else:
-            if key == Key.up:
-                self.view.navigate_up()
-            elif key == Key.down:
-                self.view.navigate_down()
-            elif key == Key.right:
-                return self.handle_select()
-            elif key == Key.left:
+            if key == Key.left:
                 self.view.navigate_back()
+            elif self.view.menu_stack[-1].items is not None:
+                if key == Key.up:
+                    self.view.navigate_up()
+                elif key == Key.down:
+                    self.view.navigate_down()
+                elif key == Key.right:
+                    return self.handle_select()
 
     def tick(self):
         """periodic ui update"""

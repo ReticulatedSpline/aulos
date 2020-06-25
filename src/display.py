@@ -23,4 +23,7 @@ class Display(NamedTuple):
     start_index: int = 0
 
     def get_selected_item(self):
-        return self.items[self.index + self.start_index]
+        if self.items is not None:
+            return self.items[self.index + self.start_index]
+        else:
+            return None

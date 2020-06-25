@@ -15,17 +15,17 @@ playlist_formats = ('.m3u')
 
 # text strings
 no_load_str = "..."
-empty_str = "<empty>"
+empty_str = "empty!"
 time_sep_str = " of "
 track_sep_str = " by "
-paused_str = "Paused."
-playing_str = "Now playing:"
-play_next_str = "Queued next."
-play_last_str = "Queued last."
-no_media_str = "Nothing playing."
-play_error_str = "Couldn't play file."
-load_error_str = "Unable to complete request."
-not_implemented_str = "Not yet implemented!"
+paused_str = "paused."
+playing_str = "now playing:"
+play_next_str = "queued next."
+play_last_str = "queued last."
+no_media_str = "nothing playing."
+play_error_str = "couldn't play file."
+load_error_str = "unable to load."
+not_implemented_str = "not yet implemented!"
 home_menu_items = [
     "playlists",
     "albums",
@@ -45,10 +45,10 @@ media_option_items = [
 ]
 
 # symbols
-home_icon = u'☯'
-dir_icon = u'ᗕ '
-menu_icon = u'➤ '
-track_icon = u'♬ '
-playlist_icon = u'✎ '
-progress_bar_fill_char = u'█'
-progress_bar_empty_char = u'▒'
+home_icon = '☯'
+dir_icon = 'ᗕ '
+menu_icon = '➤ '
+track_icon = '♬ '
+playlist_icon = '✎ '
+progress_bar_fill_char = '█'
+progress_bar_empty_char = '▒'

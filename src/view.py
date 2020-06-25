@@ -137,9 +137,7 @@ class View:
 
     def draw_empty_str(self):
         """denote an empty collection of display items"""
-        y_pos = int(self.y_indicies['status'] - 1)
-        x_pos = int(self.max_x_chars / 2)
-        self.screen.addstr(y_pos, x_pos, cfg.empty_str)
+        self.screen.addstr(1, 1, cfg.empty_str)
 
     def navigate_up(self) -> NoReturn:
         display = self.menu_stack[-1]
@@ -180,6 +178,7 @@ class View:
         display = self.menu_stack[-1]
 
         if not display.items:
+            self.draw_empty_str()
             return
 
         display_items = display.items[display.start_index:]
