@@ -156,7 +156,7 @@ class Controller:
     def handle_genre_select(self) -> NoReturn:
         path = cfg.home_menu_items[HomeOptions.GENRES]
         display_items = []
-        for key in self.library.genres.keys():
+        for key in self.library.genres:
             display_items.append(DisplayItem(ItemType.Directory, key))
         display = Display(display_items, path)
         self.view.menu_stack.append(display)
@@ -194,7 +194,7 @@ class Controller:
             return
 
         ext: str = os.path.splitext(display.menu_path)[1]
-        lib_subsets = cfg.home_menu_items[HomeOptions.ALBUMS:HomeOptions.GENRES]
+        lib_subsets = [cfg.home_menu_items[i] for i in (HomeOptions.ALBUMS, HomeOptions.GENRES)]
         if not display.menu_path:
             return self.handle_home_select()
         elif display.menu_path in lib_subsets:
