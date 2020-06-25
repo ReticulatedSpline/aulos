@@ -1,5 +1,5 @@
 # Aulos
-A digital audio player designed for local media files, intended for the Raspberry Pi, and based on the venerable [VLC media player](https://en.wikipedia.org/wiki/VLC_media_player). Aulos is not tested on animals.
+Digital audio player designed for local media files, intended for the Raspberry Pi, and based on the venerable [VLC media player](https://en.wikipedia.org/wiki/VLC_media_player). Aulos is not tested on animals.
 
 ## Roadmap
 - [x] Play .mp3 and .flac audio files
