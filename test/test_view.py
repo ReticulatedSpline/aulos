@@ -1,20 +1,18 @@
-import sys
-import os
-import unittest
 import datetime
-
-testdir = os.path.dirname(__file__)
-srcdir = '../src'
-sys.path.insert(0, os.path.abspath(os.path.join(testdir, srcdir)))
-from view import View
+import unittest
+import typing
+import src.cfg as cfg
+from src.view import View
 
 
 class TestViewMethods(unittest.TestCase):
 
-    def setUp(self):
-        self.view = View()
-
     def test_strfdelta(self):
+        tdelta = datetime.timedelta(seconds=0)
+        self.assertEqual(View._strfdelta(tdelta), "0:00")
         tdelta = datetime.timedelta(seconds=10)
-        self.assertEqual(self.view._strfdelta(tdelta, 'FOO'))
-
+        self.assertEqual(View._strfdelta(tdelta), "0:10")
+        tdelta = datetime.timedelta(minutes=1, seconds=30)
+        self.assertEqual(View._strfdelta(tdelta), "1:30")
+        tdelta = datetime.timedelta(seconds=61)
+        self.assertEqual(View._strfdelta(tdelta), "1:01")

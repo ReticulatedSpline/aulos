@@ -43,6 +43,10 @@ While running OpenDAP on the Raspberry Pi hardware is the long-term goal, note t
 
 ## Development
 
+### Unit Tests
+Uses the builtin unit testing framework.
+`python3 -m unittest discover`
+
 ### Setup
 1. Install [VLC](https://www.videolan.org/vlc/)
 1. Install [Python 3+](https://www.python.org/), and then install pip dependencies:

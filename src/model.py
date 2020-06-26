@@ -4,7 +4,7 @@ from glob import glob
 from collections import deque, defaultdict
 from mutagen.easyid3 import EasyID3 as get_tags
 
-from display import DisplayItem, ItemType
+from view import DisplayItem, ItemType
 import cfg
 
 
