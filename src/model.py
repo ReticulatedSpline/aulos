@@ -41,6 +41,8 @@ class Library:
         """return a tuple list of items, their paths, & their type"""
         items = list()
 
+        if not os.path.isdir(root):
+            return None
         for item in os.listdir(root):
             abs_path = os.path.join(root, item)
             ext = os.path.splitext(abs_path)[-1]
