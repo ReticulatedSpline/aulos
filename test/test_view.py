@@ -1,7 +1,7 @@
 import datetime
 import unittest
 import typing
-import src.cfg as cfg
+
 from src.view import View
 
 

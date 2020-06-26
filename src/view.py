@@ -3,7 +3,7 @@ import os
 import sys
 import curses
 from datetime import timedelta
-import src.cfg as cfg
+import cfg
 from typing import NamedTuple, List
 from enum import IntEnum
 

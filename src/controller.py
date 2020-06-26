@@ -3,7 +3,7 @@ from time import sleep
 from enum import IntEnum
 from pynput.keyboard import Listener, KeyCode, Key
 
-import src.cfg as cfg
+import cfg
 from view import View, ItemType, Display, DisplayItem
 from model import Player, Library
 
