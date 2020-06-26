@@ -1,5 +1,0 @@
-# add required python packages here
-pynput==1.4.5
-mutagen==1.41.1
-python-vlc==3.0.7110
-windows-curses==2.1.0; sys_platform == 'win32'

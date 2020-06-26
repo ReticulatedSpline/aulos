@@ -1,7 +1,11 @@
-import os
 import sys
+import os
 import unittest
-from datetime import timedelta
+import datetime
+
+testdir = os.path.dirname(__file__)
+srcdir = '../src'
+sys.path.insert(0, os.path.abspath(os.path.join(testdir, srcdir)))
 from view import View
 
 
@@ -11,8 +15,6 @@ class TestViewMethods(unittest.TestCase):
         self.view = View()
 
     def test_strfdelta(self):
-        self.assertEqual(self.view.timedelta(seconds=10), 'FOO')
+        tdelta = datetime.timedelta(seconds=10)
+        self.assertEqual(self.view._strfdelta(tdelta, 'FOO'))
 
-
-if __name__ == '__main__':
-    unittest.main()
