@@ -235,10 +235,8 @@ class View:
 
         self._clear_status_lines()
         if metadata is None:
-            self.notify(cfg.no_load_str)
-            self.screen.addstr(
-                self.y_indicies['metadata'], 1, cfg.no_media_str)
-            self.screen.addstr(self.y_indicies['time'], 1, cfg.no_load_str)
+            self.notify(cfg.no_media_str)
+            self.screen.addstr(self.y_indicies['metadata'], 1, cfg.no_load_str)
         else:
             title = metadata.get('title')[0]
             artist = metadata.get('artist')[0]

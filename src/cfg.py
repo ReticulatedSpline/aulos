@@ -6,10 +6,10 @@ refresh_rate = 0.01
 # in seconds, after this is reached 'skip back' resets to track start instead
 # of skipping to the last played track.
 skip_back_threshold = 5.0
-
+# playlist and music directories can be relative or absolute paths
 music_dir = "/Users/Ben/Desktop/test_music"
 music_formats = ('.mp3', '.flac')
-playlist_dir = "playlists"
+playlist_dir = "/Users/Ben/Desktop/test_playlists"
 playlist_formats = ('.m3u')
 
 # text strings
