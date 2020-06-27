@@ -154,21 +154,24 @@ class Player:
             self.curr_track.pause()
 
     def stop(self):
+        """stop the current track, discard playback position"""
         if self.curr_track:
             self.curr_track.stop()
 
-    def play_next(self, item: str):
+    def queue_next(self, item):
+        """add a plain list track paths to the top of the deque"""
         if item is None:
             return
-        if item is list:
+        if isinstance(item, list):
             self.next_tracks.extendleft(item)
         else:
             self.next_tracks.appendleft(item)
 
-    def play_last(self, item: str):
+    def queue_last(self, item):
+        """add a plain list track paths to the end of the deque"""
         if item is None:
             return
-        if item is list:
+        if isinstance(item, list):
             self.next_tracks.extend(item)
         else:
             self.next_tracks.append(item)

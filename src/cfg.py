@@ -19,8 +19,8 @@ time_sep_str = " of "
 track_sep_str = " by "
 paused_str = "paused."
 playing_str = "now playing:"
-play_next_str = "queued next."
-play_last_str = "queued last."
+play_next_str = " queued next."
+play_last_str = " queued last."
 no_media_str = "nothing playing."
 play_error_str = "couldn't play file."
 load_error_str = "unable to load."
@@ -40,7 +40,6 @@ media_option_items = [
     "view",
     "queue next",
     "queue last",
-    "delete"
 ]
 
 # symbols

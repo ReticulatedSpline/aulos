@@ -57,7 +57,7 @@ class View:
             'time': self.max_y_chars - 3,
             'progress_bar': self.max_y_chars - 2
         }
-
+        self.notify(cfg.no_media_str)
         self.update_menu()
         self.update_status(None)
 
@@ -235,7 +235,6 @@ class View:
 
         self._clear_status_lines()
         if metadata is None:
-            self.notify(cfg.no_media_str)
             self.screen.addstr(self.y_indicies['metadata'], 1, cfg.no_load_str)
         else:
             title = metadata.get('title')[0]

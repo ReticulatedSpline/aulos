@@ -26,7 +26,6 @@ class MediaOptions(IntEnum):
     VIEW = 1
     QUEUE_NEXT = 2
     QUEUE_LAST = 3
-    DELETE = 4
 
 
 class Direction(IntEnum):
@@ -49,31 +48,19 @@ class Controller:
         display = self.view.menu_stack[-1]
         selected_item = display.get_selected_item()
         path = selected_item.path
+        name = os.path.basename(path)
         if path == cfg.media_option_items[MediaOptions.PLAY]:
             self.player.play(display.menu_path)
             self.view.menu_stack.pop()
             self.view.notify(cfg.playing_str)
         elif path == cfg.media_option_items[MediaOptions.QUEUE_NEXT]:
-            self.player.play_next(display.menu_path)
+            self.player.queue_next(display.menu_path)
             self.view.menu_stack.pop()
-            self.view.notify(cfg.play_next_str)
+            self.view.notify(name + cfg.play_next_str)
         elif path == cfg.media_option_items[MediaOptions.QUEUE_LAST]:
-            self.player.play_last(display.menu_path)
+            self.player.queue_last(display.menu_path)
             self.view.menu_stack.pop()
-            self.view.notify(cfg.play_last_str)
-        elif path == cfg.media_option_items[MediaOptions.DELETE]:
-            self.view.menu_stack.pop()
-            self.view.notify(cfg.not_implemented_str)
-
-    def handle_playlist_select_view(self, file_path: str):
-        if not os.path.isfile(file_path):
-            return
-        with open(file_path, 'r') as playlist:
-            tracks = []
-            for line in playlist:
-                tracks.append(DisplayItem(ItemType.Track, line.rstrip()))
-        new_display = Display(tracks, file_path)
-        self.view.menu_stack.append(new_display)
+            self.view.notify(name + cfg.play_last_str)
 
     def handle_media_select(self, item_path: str, display: Display):
         items = []
@@ -98,14 +85,29 @@ class Controller:
         self.view.menu_stack.append(new_display)
 
     def handle_playlist_select(self, item, ext, display):
+        tracks = self.library.get_playlist_tracks(display.menu_path)
+        playlist = os.path.basename(display.menu_path)
+        items = []
+        for track in tracks:
+            items.append(DisplayItem(ItemType.Track, track))
+
         if item.path == cfg.media_option_items[MediaOptions.VIEW]:
-            self.handle_playlist_select_view(display.menu_path)
-        if item.path == cfg.media_option_items[MediaOptions.PLAY]:
+            new_display = Display(items, display.menu_path)
+            self.view.menu_stack.append(new_display)
+        elif item.path == cfg.media_option_items[MediaOptions.PLAY]:
             if not self.player.play(display.menu_path):
                 self.view.notify(cfg.play_error_str)
             else:
                 self.view.notify(cfg.playing_str)
             self.view.menu_stack.pop()
+        elif item.path == cfg.media_option_items[MediaOptions.QUEUE_NEXT]:
+            self.player.queue_next(tracks)
+            self.view.menu_stack.pop()
+            self.view.notify(playlist + cfg.play_next_str)
+        elif item.path == cfg.media_option_items[MediaOptions.QUEUE_LAST]:
+            self.player.queue_last(tracks)
+            self.view.menu_stack.pop()
+            self.view.notify(playlist + cfg.play_last_str)
 
     def handle_menu_select(self, item, ext, display):
         if ext in cfg.playlist_formats:
