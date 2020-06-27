@@ -7,8 +7,7 @@ refresh_rate = 0.01
 # of skipping to the last played track.
 skip_back_threshold = 5.0
 
-# should be able to handle any format VLC can
-music_dir = "music"
+music_dir = "/Users/Ben/Desktop/test_music"
 music_formats = ('.mp3', '.flac')
 playlist_dir = "playlists"
 playlist_formats = ('.m3u')

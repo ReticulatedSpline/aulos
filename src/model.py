@@ -15,9 +15,8 @@ class Library:
         self.tracks = deque()
         self.last_played = deque()
         for ext in cfg.music_formats:
-            file = os.path.join(cfg.music_dir, '*' + ext)
+            file = os.path.join(cfg.music_dir, '**', '*' + ext)
             self.tracks.extend(glob(file))
-        # TODO: should these all be in a single dict for easier display work?
         self.artists: dict = self.get_metadata_dict('artist')
         self.albums: dict = self.get_metadata_dict('album')
         self.years: dict = self.get_metadata_dict('year')
