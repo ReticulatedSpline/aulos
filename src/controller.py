@@ -48,7 +48,7 @@ class Controller:
         display = self.view.menu_stack[-1]
         selected_item = display.get_selected_item()
         path = selected_item.path
-        name = os.path.basename(path)
+        name = os.path.basename(display.menu_path)
         if path == cfg.media_option_items[MediaOptions.PLAY]:
             self.player.play(display.menu_path)
             self.view.menu_stack.pop()
@@ -236,8 +236,12 @@ class Controller:
         metadata = self.player.get_metadata()
         display = self.view.menu_stack[-1]
         if display.menu_path == cfg.home_menu_items[HomeOptions.QUEUE]:
+            display_items = []
+            for item in self.player.next_tracks:
+                display_items.append(DisplayItem(ItemType.Track, item))
+            new_display = display._replace(items=display_items)
             self.view.menu_stack.pop()
-            self.handle_queue_select()
+            self.view.menu_stack.append(new_display)
         self.view.update_status(metadata)
         self.view.update_menu()
         self.view.screen.refresh()

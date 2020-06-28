@@ -25,8 +25,8 @@ class Display(NamedTuple):
     """hold all information necessary to draw a display"""
     items: List[DisplayItem]
     menu_path: str = ''
-    index: int = 0
-    start_index: int = 0
+    index: int = 0  # selected item indexed from screen start
+    start_index: int = 0  # position in list to start displayed fields
 
     def get_selected_item(self):
         if len(self.items) > 0:
