@@ -70,20 +70,24 @@ class View:
     @staticmethod
     def _strfdelta(tdelta: timedelta) -> str:
         """format a timedelta into a string"""
+        if not isinstance(tdelta, timedelta):
+            return cfg.no_time_str
+
         days = tdelta.days
         hours, rem = divmod(tdelta.seconds, 3600)
         minutes, seconds = divmod(rem, 60)
 
-        time_str = f'{minutes}:{seconds:0>2}'
+        min_sec_str = f'{minutes}:{seconds:0>2}'
+        time_str = ""
         if days > 0:
-            time_str += str(days) + ' days, '
+            time_str += str(days) + cfg.day_str
         if hours > 0:
-            time_str += str(hours) + ' hours '
-        return time_str
+            time_str += str(hours) + cfg.hour_str
+        return time_str + min_sec_str
 
     @staticmethod
     def _truncate_string(string: str, num_chars: int) -> str:
-        """shorten string with an elipsis to fit into available space"""
+        """cut front characters with an elipsis to fit into available space"""
         if len(string) < num_chars:
             return string
         else:

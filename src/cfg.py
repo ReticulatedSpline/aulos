@@ -13,6 +13,9 @@ playlist_dir = "/Users/Ben/Desktop/test_playlists"
 playlist_formats = ('.m3u')
 
 # text strings
+day_str = "d, "
+hour_str = "h, "
+no_time_str = "-:--"
 no_load_str = "..."
 empty_str = "empty!"
 time_sep_str = " of "

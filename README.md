@@ -16,6 +16,8 @@ Digital audio player designed for local media files, intended for the Raspberry 
 
 - [x] Queue functionality
 
+- [ ] Code coverage
+
 - [ ] Cache library for faster startup
 
 - [ ] View recently played tracks
@@ -45,7 +47,7 @@ While running OpenDAP on the Raspberry Pi hardware is the long-term goal, note t
 Help in the form of bug reports or pull requests is appreciated. I am new to Python and the Raspberry Pi platform.
 
 ### Unit Tests
-Uses the [unittest](https://docs.python.org/3/library/unittest.html) framework. To run the tests just run `python3 -m unittest discover -v` from the project root directory.
+Uses the [unittest](https://docs.python.org/3/library/unittest.html) framework. You can run the tests by executing `python3 -m unittest discover -v` from the project root directory.
 
 ### Setup
 1. Install [VLC](https://www.videolan.org/vlc/)
