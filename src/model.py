@@ -72,11 +72,21 @@ class Player:
         self.next_tracks = deque()
         self.last_tracks = deque()
         self.library = library
-        self.curr_track: MediaPlayer = None
+        self.curr_track: vlc.MediaPlayer = None
         self.curr_track_path: str = None
 
     def __del__(self):
         self.stop()
+
+    def get_state_str(self) -> str:
+        state = self.curr_track.get_state()
+        if state == vlc.State.Paused:
+            return cfg.paused_str
+        elif state == vlc.State.Playing:
+            return cfg.playing_str
+        elif state == vlc.State.Ended:
+            return cfg.ended_str
+        return cfg.no_media_str
 
     def get_metadata(self) -> dict:
         """return a dictionary of current track's metadata"""

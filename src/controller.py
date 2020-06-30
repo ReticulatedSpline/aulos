@@ -211,25 +211,25 @@ class Controller:
         if hasattr(key, 'char'):
             if key.char == 'p':
                 self.player.play()
-                self.view.notify(cfg.playing_str)
             elif key.char == 'a':
                 self.player.pause()
-                self.view.notify(cfg.paused_str)
             elif key.char == 'n':
                 self.player.skip_forward()
             elif key.char == 'l':
                 self.player.skip_back()
-            return True
         else:
             if key == Key.left:
                 self.view.navigate_back()
-            elif self.view.menu_stack[-1].items is not None:
-                if key == Key.up:
-                    self.view.navigate_up()
-                elif key == Key.down:
-                    self.view.navigate_down()
-                elif key == Key.right:
-                    return self.handle_select()
+            # can't navigate forward or select on an empty menu
+            elif self.view.menu_stack[-1].items is None:
+                return
+            elif key == Key.up:
+                self.view.navigate_up()
+            elif key == Key.down:
+                self.view.navigate_down()
+            elif key == Key.right:
+                return self.handle_select()
+        self.view.notify(self.player.get_state_str())
 
     def tick(self):
         """periodic ui update"""
