@@ -48,9 +48,10 @@ class View:
             home_items.append(DisplayItem(ItemType.Menu, item))
         self.menu_stack.append(Display(home_items, ''))
 
-        # persistant screen locations
         self.max_y_chars, self.max_x_chars = self.screen.getmaxyx()
+        # 7 from 3 border chars + four status lines
         self.num_menu_lines = self.max_y_chars - 7
+        # persistant screen locations
         self.y_indicies = {
             'status': self.max_y_chars - 5,
             'metadata': self.max_y_chars - 4,
@@ -58,8 +59,6 @@ class View:
             'progress_bar': self.max_y_chars - 2
         }
         self.notify(cfg.no_media_str)
-        self.update_menu()
-        self.update_status(None)
 
     def __del__(self):
         """restore the previous state of the terminal"""
@@ -88,16 +87,47 @@ class View:
     @staticmethod
     def _truncate_string(string: str, num_chars: int) -> str:
         """cut front characters with an elipsis to fit into available space"""
-        if len(string) < num_chars:
+        if string is None or num_chars < 0:
+            return ""
+        elif len(string) < num_chars:
             return string
-        else:
-            string = os.path.basename(string)
 
         str_len = len(string)
         if str_len > num_chars:
             start = (str_len - num_chars) + 3  # three for ellipsis
             string = '...' + string[start:]
         return string
+
+    @staticmethod
+    def _draw_progress_bar(run_time: int, curr_time: int, max_len: int):
+        """return a textual progress bar spanning max_len"""
+        if max_len <= 0:
+            return None
+        elif (run_time <= 0) or (curr_time < 0):
+            fill_count = 0
+            void_count = max_len
+        elif run_time < curr_time:
+            fill_count = max_len
+            void_count = 0
+        else:
+            fill_count = int(max_len * curr_time / run_time)
+            void_count = max_len - fill_count
+
+        progress_fill = cfg.progress_bar_fill_char * fill_count
+        progress_void = cfg.progress_bar_empty_char * void_count
+        return progress_fill + progress_void
+
+    @staticmethod
+    def _draw_time_str(run_time: int, curr_time: int) -> str:
+        run_time_str = View._strfdelta(timedelta(seconds=run_time))
+        curr_time_str = View._strfdelta(timedelta(seconds=curr_time))
+        if run_time > 0:
+            percent = int((curr_time / run_time) * 100)
+        else:
+            percent = 0
+        percent_str = ' (' + str(percent) + '%)'
+        time_str = curr_time_str + cfg.time_sep_str + run_time_str
+        return time_str + percent_str
 
     def _clear_line(self, line: int):
         self.screen.move(line, 1)
@@ -133,38 +163,6 @@ class View:
         # draw middle border line
         self.screen.hline(middle_border, 1, curses.ACS_HLINE,
                           self.max_x_chars - 2)
-
-    def _draw_progress_bar(self, metadata: dict):
-        if metadata is None:
-            run_time = 0
-            curr_time = 0
-        else:
-            run_time = metadata.get('run_time')
-            curr_time = metadata.get('curr_time')
-
-        progress_bar_chars = self.max_x_chars - 2
-        if run_time == 0:
-            percent = 0
-            fill_count = 0
-            void_count = progress_bar_chars
-        else:
-            percent = int((curr_time / run_time) * 100)
-            fill_count = int(progress_bar_chars * curr_time / run_time)
-            void_count = progress_bar_chars - fill_count
-
-        run_time_str = self._strfdelta(timedelta(seconds=run_time))
-        curr_time_str = self._strfdelta(timedelta(seconds=curr_time))
-        percent_str = ' (' + str(percent) + '%)'
-        time_str = curr_time_str + cfg.time_sep_str + run_time_str
-        time_str += percent_str
-
-        # two border characters
-        progress_fill = cfg.progress_bar_fill_char * fill_count
-        progress_void = cfg.progress_bar_empty_char * void_count
-        progress_bar = progress_fill + progress_void
-
-        self.screen.addstr(self.y_indicies['time'], 1, time_str)
-        self.screen.addstr(self.y_indicies['progress_bar'], 1, progress_bar)
 
     def draw_empty_str(self):
         """denote an empty collection of display items"""
@@ -241,9 +239,18 @@ class View:
         self._clear_status_lines()
         if metadata is None:
             self.screen.addstr(self.y_indicies['metadata'], 1, cfg.no_load_str)
+            run_time = curr_time = 0
         else:
             title = metadata.get('title')[0]
             artist = metadata.get('artist')[0]
+            run_time = metadata.get('run_time', 0)
+            curr_time = metadata.get('curr_time', 0)
             track_info = title + cfg.track_sep_str + artist
             self.screen.addstr(self.y_indicies['metadata'], 1, track_info)
-        self._draw_progress_bar(metadata)
+
+        # two border characters
+        width = self.max_x_chars - 2
+        progress_bar = self._draw_progress_bar(run_time, curr_time, width)
+        time_str = self._draw_time_str(run_time, curr_time)
+        self.screen.addstr(self.y_indicies['time'], 1, time_str)
+        self.screen.addstr(self.y_indicies['progress_bar'], 1, progress_bar)

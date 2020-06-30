@@ -12,7 +12,7 @@ Digital audio player designed for local media files, intended for the Raspberry 
 
 - [x] Browse library by playlist
 
-- [x] Browse library by artist, album, genre, and year
+- [x] Browse library by artist, album, and genre
 
 - [x] Queue functionality
 

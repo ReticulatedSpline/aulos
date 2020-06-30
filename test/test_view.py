@@ -24,6 +24,7 @@ class TestViewMethods(unittest.TestCase):
         self.assertEqual(View._strfdelta(tdelta), "16d, 2h, 9:01")
 
     def test_truncate_string(self):
+        self.assertEqual("", View._truncate_string(None, 0))
         empty_str = ""
         self.assertEqual("", View._truncate_string(empty_str, 10))
         short_str = "should fit"
@@ -31,6 +32,21 @@ class TestViewMethods(unittest.TestCase):
         long_str = "this will need to be truncated to fit into 16 characters!"
         expected_str = "...6 characters!"
         self.assertEqual(expected_str, View._truncate_string(long_str, 16))
-        path_str = "this/is/a/file/path.png"
-        expected_str = "path.png"
-        self.assertEqual(expected_str, View._truncate_string(path_str, 20))
+
+    def test_draw_progress_bar(self):
+        self.assertEqual(None, View._draw_progress_bar(0, 0, 0))
+        self.assertEqual(None, View._draw_progress_bar(-1, -1, -1))
+        
+        expected_str = "▒▒▒▒▒▒▒▒▒▒"
+        returned_str = View._draw_progress_bar(0, 0, 10)
+        self.assertEqual(expected_str, returned_str)
+        
+        expected_str = "█████▒▒▒▒▒"
+        returned_str = View._draw_progress_bar(10, 5, 10)
+        self.assertEqual(expected_str, returned_str)
+        
+        expected_str = "██████████"
+        returned_str = View._draw_progress_bar(10, 10, 10)
+        self.assertEqual(expected_str, returned_str)
+        returned_str = View._draw_progress_bar(5, 10, 10)
+        self.assertEqual(expected_str, returned_str)

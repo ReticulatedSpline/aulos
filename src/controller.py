@@ -21,7 +21,7 @@ class HomeOptions(IntEnum):
 
 
 class MediaOptions(IntEnum):
-    """menu options for playlists and tracks"""
+    """menu options for tracks and track collections"""
     PLAY = 0
     VIEW = 1
     QUEUE_NEXT = 2
@@ -217,6 +217,7 @@ class Controller:
                 self.player.skip_forward()
             elif key.char == 'l':
                 self.player.skip_back()
+            self.view.notify(self.player.get_state_str())
         else:
             if key == Key.left:
                 self.view.navigate_back()
@@ -229,7 +230,6 @@ class Controller:
                 self.view.navigate_down()
             elif key == Key.right:
                 return self.handle_select()
-        self.view.notify(self.player.get_state_str())
 
     def tick(self):
         """periodic ui update"""

@@ -79,6 +79,8 @@ class Player:
         self.stop()
 
     def get_state_str(self) -> str:
+        if not self.curr_track:
+            return cfg.no_media_str
         state = self.curr_track.get_state()
         if state == vlc.State.Paused:
             return cfg.paused_str
