@@ -154,10 +154,10 @@ class View:
         title = self._truncate_string(title, self.max_x_chars - 4)
         title_pos = (self.max_x_chars - len(title)) // 2
         self.screen.addstr(0, title_pos, title)
+        #  connecting line tee characters from extended curses set
         self.screen.addch(0, title_pos - 1, curses.ACS_RTEE)
         self.screen.addch(0, title_pos + len(title), curses.ACS_LTEE)
         middle_border = self.y_indicies['status'] - 1
-        # draw connecting characters from extended curses set
         self.screen.addch(middle_border, 0, curses.ACS_LTEE)
         self.screen.addch(middle_border, self.max_x_chars - 1, curses.ACS_RTEE)
         # draw middle border line
@@ -166,7 +166,9 @@ class View:
 
     def draw_empty_str(self):
         """denote an empty collection of display items"""
-        self.screen.addstr(1, 1, cfg.empty_str)
+        center_x = (self.max_x_chars - len(cfg.empty_str)) // 2
+        center_y = self.num_menu_lines // 2
+        self.screen.addstr(center_y, center_x, cfg.empty_str)
 
     def navigate_up(self):
         display = self.menu_stack[-1]
@@ -213,25 +215,26 @@ class View:
         display_items = display.items[display.start_index:]
         if len(display_items) <= 0:
             self.draw_empty_str()
-        else:
-            for list_index, item in enumerate(display_items, start=1):
-                if list_index > self.num_menu_lines:
-                    break
-                item_name = os.path.basename(item.path)
-                item_name = self._truncate_string(item_name, self.max_x_chars - 4)
-                if item.item_type is ItemType.Menu:
-                    item_name = cfg.menu_icon + item_name
-                elif item.item_type is ItemType.Directory:
-                    item_name = cfg.dir_icon + item_name
-                elif item.item_type is ItemType.Playlist:
-                    item_name = cfg.playlist_icon + item_name
-                elif item.item_type is ItemType.Track:
-                    item_name = cfg.track_icon + item_name
+            return
 
-                if display.index + 1 == list_index:
-                    self.screen.addstr(list_index, 1, item_name, curses.A_REVERSE)
-                else:
-                    self.screen.addstr(list_index, 1, item_name)
+        for list_index, item in enumerate(display_items, start=1):
+            if list_index > self.num_menu_lines:
+                break
+            item_name = os.path.basename(item.path)
+            item_name = self._truncate_string(item_name, self.max_x_chars - 4)
+            if item.item_type is ItemType.Menu:
+                item_name = cfg.menu_icon + item_name
+            elif item.item_type is ItemType.Directory:
+                item_name = cfg.dir_icon + item_name
+            elif item.item_type is ItemType.Playlist:
+                item_name = cfg.playlist_icon + item_name
+            elif item.item_type is ItemType.Track:
+                item_name = cfg.track_icon + item_name
+
+            if display.index + 1 == list_index:
+                self.screen.addstr(list_index, 1, item_name, curses.A_REVERSE)
+            else:
+                self.screen.addstr(list_index, 1, item_name)
 
     def update_status(self, metadata: dict):
         """update track metadata and progress indicators."""
