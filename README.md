@@ -1,5 +1,5 @@
 # Aulos
-Digital audio player designed for local media files, intended for the Raspberry Pi, and based on the venerable [VLC media player](https://en.wikipedia.org/wiki/VLC_media_player). The goal is to recreate the [Rockbox](https://www.rockbox.org/) experience on cheap, modern hardware in a portable installation.
+Aulos is a digital audio player designed for local media files, intended for the Raspberry Pi, and based on the venerable [VLC media player](https://en.wikipedia.org/wiki/VLC_media_player). The goal is to recreate the [Rockbox](https://www.rockbox.org/) experience on cheap, modern hardware in a portable installation.
 
 ## Roadmap
 - [x] Play .mp3 and .flac audio files
@@ -20,13 +20,15 @@ Digital audio player designed for local media files, intended for the Raspberry 
 
 - [ ] Cache library for faster startup
 
+- [ ] Browse by library by year
+
 - [ ] View recently played tracks
 
-- [ ] Reorderable queue
+- [ ] Editable queue
 
 - [ ] Shuffling and looping
 
-- [ ] Quick scrolling
+- [ ] Quick scrolling and/or search
 
 - [ ] Monochrome, [dithered](https://en.wikipedia.org/wiki/Dither) album art
 
